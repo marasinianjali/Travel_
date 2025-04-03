@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tourism Companies</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 1000px;
+            margin-top: 40px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 20px;
+        }
+
+        a.create-btn {
+            display: inline-block;
+            padding: 12px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        a.create-btn:hover {
+            background-color: #0056b3;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+
+        td a {
+            text-decoration: none;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 5px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        td a.edit-btn {
+            background-color: #28a745;
+            color: white;
+        }
+
+        td a.edit-btn:hover {
+            background-color: #218838;
+        }
+
+        td a.delete-btn {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        td a.delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .no-companies {
+            text-align: center;
+            font-size: 18px;
+            color: #888;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Tourism Companies List</h2>
+
+        <a href="{% url 'tourism_company_create' %}" class="create-btn">Create a new tourism company</a>
+
+        {% if companies %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Company ID</th>
+                        <th>User Name</th>
+                        <th>User Phone</th>
+                        <th>User Email</th>
+                        <th>Company Name</th>
+                        <th>Company Phone</th>
+                        <th>Company Address</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for company in companies %}
+                        <tr>
+                            <td>{{ company.company_id }}</td>
+                            <td>{{ company.user_name }}</td>
+                            <td>{{ company.user_phone }}</td>
+                            <td>{{ company.user_email }}</td>
+                            <td>{{ company.company_name }}</td>
+                            <td>{{ company.company_phone }}</td>
+                            <td>{{ company.company_address }}</td>
+                            <td>
+                                <div style="display: flex; gap: 10px;">
+                                    <a href="{% url 'tourism_company_update' company.pk %}" class="edit-btn">Edit</a>
+                                    <a href="{% url 'tourism_company_delete' company.pk %}" class="delete-btn">Delete</a>
+                                </div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            <p class="no-companies">No tourism companies available.</p>
+        {% endif %}
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,14 @@
+{% block content %}
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/add_package.css' %}">
+
+<h2>Add Tour Package</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save</button>
+</form>
+<a href="{% url 'tour_package_list' %}">Back to List</a>
+{% endblock %}

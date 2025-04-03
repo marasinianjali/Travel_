@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Followers</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .list {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .user {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user a {
+            color: #3498db; /* Blue color for links */
+            text-decoration: none; /* Remove default underline */
+            font-weight: bold;
+        }
+        .user a:hover {
+            text-decoration: underline; /* Underline on hover */
+            color: #2980b9; /* Darker blue on hover */
+        }
+        a.back-to-dashboard {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        a.back-to-dashboard:hover {
+            text-decoration: underline;
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="list">
+        <h1>Your Followers</h1>
+        {% if followers %}
+            {% for follow in followers %}
+                <div class="user">
+                    <a href="{% url 'social_community:public_profile' user_id=follow.follower.id %}">
+                        <strong>{{ follow.follower.name }}</strong> ({{ follow.follower.email }})
+                    </a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>You have no followers yet.</p>
+        {% endif %}
+        
+        <a href="{% url 'user_details' %}" class="back-to-dashboard">Back to Dashboard</a>
+    </div>
+</body>
+</html>

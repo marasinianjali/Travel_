@@ -1,0 +1,18 @@
+{% block content %}
+<h2>Review Tour Package</h2>
+
+<p><strong>Package Name:</strong> {{ package.package_name }}</p>
+<p><strong>Company:</strong> {{ package.company_name }}</p>
+<p><strong>Description:</strong> {{ package.description }}</p>
+<p><strong>Amount:</strong> {{ package.amount }}</p>
+<p><strong>Duration:</strong> {{ package.duration }}</p>
+<p><strong>Location:</strong> {{ package.city }}, {{ package.country }}</p>
+<p><strong>Tour Type:</strong> {{ package.tour_type }}</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" name="approve">✅ Approve</button>
+</form>
+
+<a href="{% url 'tour_package_list' %}">Back to List</a>
+{% endblock %}

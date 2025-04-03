@@ -1,0 +1,90 @@
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/tour_package.css' %}">
+
+<h2>Tour Packages</h2>
+<p>User ID: {{ user_id }}</p>
+    <p>User Role: {{ user_role }}</p>
+    <p>User ID: {{ request.session.user_id }}</p>
+    <p>User Role: {{ request.session.user_role }}</p>
+
+
+<!-- Add Tour Package (Outside Loop) -->
+ <!-- Here Guest => Tourism Company-->
+ <!-- {% if user_role == "Admin" %}
+ <th>Status</th>
+ <th>Actions</th>
+{% else %}
+ <th>Book</th>  {# This should appear if the user is not an Admin #}
+{% endif %} -->
+
+
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Company</th>
+        <th>Date</th>
+        <th>Amount</th>
+        <th>Duration</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Tour Type</th>
+        {% if user_role == "Admin"  %}
+            <th>Status</th>
+            <th>Actions</th>
+        {% endif %}
+        <!-- If package is not booked -->
+        {% if user_role == "User" %}
+        <th>Book</th>
+        {% endif %}
+
+    </tr>
+
+    {% for package in packages %}
+    <tr>
+        <td>{{ package.package_name }}</td>
+        <td>{{ package.company_name }}</td>
+        <td>{{ package.date }}</td>
+        <td>{{ package.amount }}</td>
+        <td>{{ package.duration }}</td>
+        <td>{{ package.city }}</td>
+        <td>{{ package.country }}</td>
+        <td>{{ package.tour_type }}</td>
+
+        {% if user_role == "Admin"  %}
+            <!-- Show Status -->
+            <td>
+                {% if package.is_approved %}
+                    ✅ Approved
+                {% else %}
+                    ❌ Pending
+                {% endif %}
+            </td>
+
+            <!-- Only show Edit/Delete for Admins -->
+            
+            <td>
+                <a href="{% url 'edit_tour_package' package.package_id %}">Edit</a> 
+                <a href="{% url 'delete_tour_package' package.package_id %}">Delete</a>
+            
+                {% if not package.is_approved %}
+                <a href="{% url 'review_package' package.package_id %}">Review</a>
+                {% endif %} 
+            
+            </td>
+        
+        {% endif %}  
+         <!-- If package is not booked -->
+                {% if user_role == "User" %}
+            <td>
+                <a href="{% url 'book_tour' package.package_id %}">Book</a>
+            </td>
+        {% endif %}
+    </tr>
+    {% endfor %}
+</table>
+
+
+
+{% endblock %}

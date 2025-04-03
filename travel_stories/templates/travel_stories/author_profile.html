@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ author.name }}'s Profile</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+        }
+        .container {
+            margin-top: 30px;
+        }
+        .post, .article {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+        .post img, .article img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .post video, .article video {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .user-name, .author-name {
+            font-weight: bold;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .user-name:hover, .author-name:hover {
+            text-decoration: underline;
+        }
+        .timestamp {
+            color: #777;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mb-4">{{ author.name }}'s Profile</h1>
+        <p><strong>Bio:</strong> {{ author.bio|default:"No bio yet" }}</p>
+
+        <!-- User-Generated Stories -->
+        <h2>Stories by {{ author.name }}</h2>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post">
+                    <p>
+                        <span class="timestamp">{{ post.created_at }}</span>
+                        {% if post.category %}
+                            <span> | Category: <a href="{% url 'travel_stories:category_detail' category_id=post.category.id %}">{{ post.category.name }}</a></span>
+                        {% endif %}
+                    </p>
+                    <p>{{ post.content }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Post Image">
+                    {% endif %}
+                    {% if post.video %}
+                        <video controls>
+                            <source src="{{ post.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                    <a href="{% url 'travel_stories:post_detail' post_id=post.id %}" class="btn btn-primary btn-sm mt-2">View Details</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>{{ author.name }} has not shared any stories yet.</p>
+        {% endif %}
+
+        <!-- Articles -->
+        <h2>Articles by {{ author.name }}</h2>
+        {% if articles %}
+            {% for article in articles %}
+                <div class="article">
+                    <h4>{{ article.title }}</h4>
+                    <p>
+                        <span class="timestamp">{{ article.created_at }}</span>
+                        {% if article.category %}
+                            <span> | Category: <a href="{% url 'travel_stories:category_detail' category_id=article.category.id %}">{{ article.category.name }}</a></span>
+                        {% endif %}
+                    </p>
+                    <p>{{ article.content|truncatewords:50 }}</p>
+                    {% if article.image %}
+                        <img src="{{ article.image.url }}" alt="Article Image">
+                    {% endif %}
+                    <a href="{% url 'travel_stories:article_detail' article_id=article.id %}" class="btn btn-primary btn-sm mt-2">Read More</a>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>{{ author.name }} has not written any articles yet.</p>
+        {% endif %}
+
+        <a href="{% url 'travel_stories:travel_stories_home' %}" class="btn btn-secondary mt-3">Back to Travel Stories</a>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* General Page Styling */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #4facfe, #00f2fe);
+    color: #333;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+/* Headings */
+h2 {
+    font-size: 28px;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+    color: #fff;
+    letter-spacing: 1px;
+}
+
+/* Review Form */
+form {
+    background: #fff;
+    padding: 20px;
+    width: 50%;
+    margin: auto;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+form p {
+    margin-bottom: 15px;
+    font-size: 16px;
+}
+
+form input,
+form textarea,
+form select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+/* Submit Button */
+button {
+    background: #ff7eb3;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: block;
+    margin: auto;
+    margin-top: 10px;
+}
+
+button:hover {
+    background: #ff4e89;
+}
+
+/* Reviews List */
+ul {
+    list-style: none;
+    padding: 0;
+    width: 60%;
+    margin: auto;
+}
+
+li {
+    background: white;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    text-align: left;
+}
+
+/* Review Username */
+li strong {
+    font-size: 18px;
+    color: #ff4e89;
+}
+
+/* Rating Stars */
+span {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffb400;
+}
+
+/* Review Text */
+p {
+    font-size: 16px;
+    margin-top: 5px;
+    color: #444;
+}
+
+/* Review Date */
+small {
+    display: block;
+    font-size: 14px;
+    color: #777;
+    margin-top: 5px;
+}
+
+/* Review Images */
+img {
+    width: 100px;
+    border-radius: 8px;
+    margin-top: 10px;
+}
+
+/* Add Review Button */
+a {
+    display: inline-block;
+    background: #ffc107;
+    color: black;
+    font-weight: bold;
+    margin-bottom: 20px;
+    padding: 10px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+}
+
+a:hover {
+    background: #e0a800;
+}

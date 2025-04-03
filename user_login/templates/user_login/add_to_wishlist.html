@@ -1,0 +1,12 @@
+
+<form method="post" action="{% url 'add_to_wishlist' %}">
+    {% csrf_token %}
+    <label for="id_destination_name">Destination name:</label>
+    {{ form.destination_name }}
+    
+    <label for="id_description">Description:</label>
+    {{ form.description }}
+
+    <button type="submit" class="btn btn-primary">Add Destination</button>
+    <a href="{% url 'user_details' %}" class="btn btn-secondary">Cancel</a>
+</form>

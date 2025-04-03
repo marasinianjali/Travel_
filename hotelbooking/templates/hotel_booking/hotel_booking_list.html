@@ -1,0 +1,10 @@
+<h2>Hotel Bookings</h2>
+<a href="{% url 'add_hotel_booking' %}">Add Booking</a>
+<ul>
+    {% for booking in bookings %}
+        <li>{{ booking.hotel_name }} - {{ booking.total_person }} people 
+            <a href="{% url 'edit_hotel_booking' booking.hotel_id %}">Edit</a> | 
+            <a href="{% url 'delete_hotel_booking' booking.hotel_id %}">Delete</a>
+        </li>
+    {% endfor %}
+</ul>

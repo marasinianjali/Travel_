@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Revenue Details</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #f4f7fc;
+            font-family: 'Arial', sans-serif;
+        }
+
+        .container {
+            margin-top: 50px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .table th, .table td {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Hotel Revenue Details</h2>
+
+    <table class="table table-bordered">
+        <tbody>
+            <tr>
+                <th>Hotel Name</th>
+                <td>{{ revenue.hotel_name }}</td>
+            </tr>
+            <tr>
+                <th>Total Revenue</th>
+                <td>${{ revenue.amount }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ revenue.status }}</td>
+            </tr>
+            {% comment %} <tr>
+                <th>Description</th>
+                <td>{{ revenue.description }}</td>
+            </tr>
+            <tr>
+                <th>Created At</th>
+                <td>{{ revenue.created_at }}</td>
+            </tr>
+        </tbody> {% endcomment %}
+    </table>
+
+    <a href="{% url 'hotel_revenue_list' %}" class="btn btn-primary">Back to List</a>
+</div>
+
+</body>
+</html>

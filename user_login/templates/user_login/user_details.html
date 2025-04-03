@@ -1,0 +1,146 @@
+<!-- templates/user_login/user_details.html -->
+
+{% block content %}
+{% load static %}
+
+<link rel="stylesheet" href="{% static 'css/user_details.css' %}">
+<div class="container">
+    <h2>My Account</h2>
+    <p><strong>Name:</strong> {{ user.name }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Phone:</strong> {{ user.phone }}</p>
+    <p><strong>Address:</strong> {{ user.address }}</p>
+    <p><strong>Bio:</strong> {{ user.bio|default:"Not set" }}</p>
+    <p><strong>Theme:</strong> {{ user.theme }}</p>
+
+     <!-- Profile Customization Form -->
+     <h3>Update Profile</h3>
+     <form method="post" action="{% url 'update_profile' %}">
+         {% csrf_token %}
+         {{ profile_form.as_p }}
+         <button type="submit" class="btn btn-primary">Update Profile</button>
+     </form>
+
+    <!-- Follower/Following Section -->
+    <h3>Social Connections</h3>
+    <p>
+        <strong>Total Following:</strong> 
+        <a href="{% url 'social_community:followed_list' %}">{{ followed_count }}</a>
+    </p>
+    <p>
+        <strong>Total Followers:</strong> 
+        <a href="{% url 'social_community:followers_list' %}">{{ followers_count }}</a>
+    </p>
+
+   
+
+    <!-- Wishlist Section -->
+    <h3>Saved Destinations & Wishlist</h3>
+            {% if wishlist_items %}
+            <ul>
+                {% for item in wishlist_items %}
+                    <li>{{ item.destination_name }} - {{ item.description|default:"No description" }} (Added: {{ item.added_at }})</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No destinations saved yet.</p>
+        {% endif %}
+    <h4>Add to Wishlist</h4>
+    <form method="post" action="{% url 'add_to_wishlist' %}">
+        {% csrf_token %}
+        {{ wishlist_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Destination</button>
+    </form>
+   
+
+    
+
+    <!-- Trip Progress Tracker Section -->
+    <h3>Trip </h3>
+        {% if trips %}
+        <ul>
+            {% for trip in trips %}
+                <li>{{ trip.destination }} ({{ trip.start_date }} to {{ trip.end_date }}) - Status: {{ trip.status }}</li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No trips planned yet.</p>
+    {% endif %}
+
+    <h4>Add a Trip</h4>
+    <form method="post" action="{% url 'add_trip' %}">
+        {% csrf_token %}
+        {{ trip_form.as_p }}
+        <button type="submit" class="btn btn-primary">Add Trip</button>
+    </form>
+
+    <!-- Community Features Link -->
+    <h3>Community Features</h3>
+    <p>Connect with other travelers!</p>
+    <a href="{% url 'social_community:community_features' %}" class="btn btn-primary">Go to Community Features</a>
+
+
+    <a href="{% url 'user_dashboard' %}" class="btn btn-primary">Back to Dashboard</a>
+</div>
+<!-- Search Other Travelers -->
+<div class="search-form">
+    <h4>Find Other Travelers</h4>
+    <form method="get">
+        <input type="text" name="search" placeholder="Search by name" value="{{ search_query }}">
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<!-- Search Results -->
+{% if search_results %}
+    <div class="search-results">
+        <h4>Search Results</h4>
+        {% for traveler in search_results %}
+            <div class="user" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                <span>
+                    <a href="{% url 'social_community:public_profile' user_id=traveler.id %}" style="color: #3498db; text-decoration: none; font-weight: bold;">
+                        {{ traveler.name }}
+                    </a> ({{ traveler.email }})
+                </span>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="user_to_follow" value="{{ traveler.id }}">
+                    <input type="hidden" name="follow_user" value="1">
+                    <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                        {% if traveler in user.following.all %}
+                            Unfollow
+                        {% else %}
+                            + Follow
+                        {% endif %}
+                    </button>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+{% elif search_query %}
+    <p>No travelers found for "{{ search_query }}".</p>
+{% else %}
+    <h4>All Travelers</h4>
+    {% for traveler in search_results %}
+        <div class="user" style="border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+            <span>
+                <a href="{% url 'social_community:public_profile' user_id=traveler.id %}" style="color: #3498db; text-decoration: none; font-weight: bold;">
+                    {{ traveler.name }}
+                </a> ({{ traveler.email }})
+            </span>
+            <form method="post" style="display:inline;">
+                {% csrf_token %}
+                <input type="hidden" name="user_to_follow" value="{{ traveler.id }}">
+                <input type="hidden" name="follow_user" value="1">
+                <button type="submit" style="background-color: #28a745; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                    {% if traveler in user.following.all %}
+                        Unfollow
+                    {% else %}
+                        + Follow
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    {% endfor %}
+{% endif %}
+{% endblock %}

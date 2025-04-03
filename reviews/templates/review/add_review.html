@@ -1,0 +1,13 @@
+{% block content %}
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/review.css' %}">
+
+<h2>Add a Review</h2>
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Submit Review</button>
+</form>
+{% endblock %}

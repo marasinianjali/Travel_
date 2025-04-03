@@ -1,0 +1,174 @@
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #ff7e5f, #feb47b);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.container {
+    max-width: 1200px;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+    text-align: center;
+}
+
+h2 {
+    color: #333;
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 25px;
+}
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.card {
+    width: 100%;
+    max-width: 280px;
+    border-radius: 15px;
+    overflow: hidden;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+    position: relative;
+    background: white;
+}
+
+.card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+}
+
+.card-body {
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.card-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #fff;
+}
+
+.card-text {
+    font-size: 18px;
+    margin-bottom: 20px;
+    color: #fff;
+    font-weight: 500;
+}
+
+.btn-light, .btn-logout {
+    display: inline-block;
+    padding: 12px 18px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    font-weight: bold;
+    transition: background 0.3s, transform 0.3s;
+    text-decoration: none;
+    color: #333;
+}
+
+.btn-light:hover, .btn-logout:hover {
+    background: rgba(255, 255, 255, 1);
+    transform: scale(1.05);
+}
+
+.bg-primary {
+    background: linear-gradient(to right, #1e3c72, #2a5298);
+}
+
+.bg-success {
+    background: linear-gradient(to right, #56ab2f, #a8e063);
+}
+
+.bg-danger {
+    background: linear-gradient(to right, #d31027, #ea384d);
+}
+
+.bg-warning {
+    background: linear-gradient(to right, #ffb347, #ffcc33);
+}
+
+.bg-secondary {
+    background: linear-gradient(to right, #485563, #29323c);
+}
+
+.btn-light {
+    background: rgb(138, 98, 175);
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+
+.btn-light:hover {
+    background: rgb(167, 4, 153);
+}
+.btn-logout{
+    width: 20%;
+    margin-bottom: 2%;
+}
+.logout-body{
+    background-color: #2a5298;
+    color:white;
+    padding: 25px;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+
+}
+post {
+    border-bottom: 1px solid #ddd;
+    padding: 10px 0;
+    margin-bottom: 10px;
+}
+.post:last-child {
+    border-bottom: none;
+}
+.post .user-name {
+    font-weight: bold;
+    color: #3498db;
+    text-decoration: none;
+}
+.post .user-name:hover {
+    text-decoration: underline;
+}
+.post .timestamp {
+    color: #777;
+    font-size: 0.9rem;
+}
+.post img {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+.post video {
+    max-width: 100%;
+    height: auto;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+.view-all {
+    display: inline-block;
+    margin-top: 10px;
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+.view-all:hover {
+    text-decoration: underline;
+}

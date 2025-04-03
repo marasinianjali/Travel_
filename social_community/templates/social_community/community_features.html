@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Community Features</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2c3e50;
+            margin-top: 20px;
+        }
+        p {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .post-form {
+            margin-bottom: 30px;
+        }
+        .post-form textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        .post-form input[type="file"] {
+            margin: 10px 0;
+        }
+        .post-form button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        .post-form button:hover {
+            background-color: #2980b9;
+        }
+        .post {
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+        }
+        .post .user-name {
+            font-weight: bold;
+            color: #3498db;
+            text-decoration: none;
+        }
+        .post .user-name:hover {
+            text-decoration: underline;
+        }
+        .post .timestamp {
+            color: #777;
+            font-size: 0.9rem;
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .post video {
+            max-width: 100%;
+            height: auto;
+            margin-top: 10px;
+            border-radius: 5px;
+        }
+        .message {
+            color: green;
+            margin-bottom: 15px;
+        }
+        a.back-link {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+            font-weight: bold;
+        }
+        a.back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Community Features</h1>
+        <p>Welcome to the community! Connect with other travelers, join discussion groups, and more.</p>
+
+        <!-- Display messages (success or error) -->
+        {% if messages %}
+            {% for message in messages %}
+                <p class="message">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+
+        <!-- Post Creation Form -->
+        <div class="post-form">
+            <h2>Share Your Story</h2>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                {{ post_form.as_p }}
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+        <!-- Community Feed -->
+        <h2>Community Feed</h2>
+        {% if posts %}
+            {% for post in posts %}
+                <div class="post">
+                    <p>
+                        <a href="{% url 'social_community:public_profile' user_id=post.user.id %}" class="user-name">
+                            {{ post.user.name }}
+                        </a>
+                        <span class="timestamp"> - {{ post.created_at }}</span>
+                    </p>
+                    <p>{{ post.content }}</p>
+                    {% if post.image %}
+                        <img src="{{ post.image.url }}" alt="Post Image">
+                    {% endif %}
+                    {% if post.video %}
+                        <video controls>
+                            <source src="{{ post.video.url }}" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No posts yet. Be the first to share your story!</p>
+        {% endif %}
+
+        <a href="{% url 'user_details' %}" class="back-link">Back to My Account</a>
+    </div>
+</body>
+</html>

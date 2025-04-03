@@ -1,0 +1,26 @@
+<h2>Total Bookings for My Company</h2>
+
+<table border="1">
+    <tr>
+        <th>Package Name</th>
+        <!-- <th>User ID</th> -->
+        <th>User Name</th>
+        <th>User Address</th>
+        <th>User Phone</th>
+        <th>Booking Date</th>
+        <th>Status</th>
+    </tr>
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking.package.package_name }}</td>
+        <!-- <td>{{ booking.user.id }}</td>  {# Corrected from user_id to user.id #} -->
+        <td>{{ booking.user.name }}</td>
+        <td>{{ booking.user.address }}</td>  <!-- ✅ Fetch user address -->
+        <td>{{ booking.user.phone }}</td> 
+        <td>{{ booking.booking_date }}</td>
+        <td>{{ booking.status }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<a href="{% url 'company_dashboard' %}">Back to Dashboard</a>

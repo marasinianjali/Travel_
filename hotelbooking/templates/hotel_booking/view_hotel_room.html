@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Room Details</h2>
+
+    <div class="card mt-3">
+        <div class="card-body">
+            <h5 class="card-title">Room Number: {{ room.room_number }}</h5>
+            <p><strong>Type:</strong> {{ room.room_type }}</p>
+            <p><strong>Price:</strong> ${{ room.price_per_night }}/night</p>
+            <p><strong>Description:</strong> {{ room.description }}</p>
+
+            <div class="mt-3">
+                <a href="{% url 'edit_hotel_room' room.id %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'delete_hotel_room' room.id %}" class="btn btn-danger">Delete</a>
+                <a href="{% url 'hotel_rooms_list' %}" class="btn btn-secondary">Back to List</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

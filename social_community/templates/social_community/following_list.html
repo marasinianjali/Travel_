@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Followed Users</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .list {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .user {
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        a {
+            display: inline-block;
+            margin-top: 20px;
+            text-decoration: none;
+            color: #007bff;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .search-form {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="list">
+        <h1>Users You Follow</h1>
+
+        <!-- Search Form -->
+        <div class="search-form">
+            <form method="get">
+                <input type="text" name="search" placeholder="Search followed users" value="{{ search_query }}">
+                <button type="submit">Search</button>
+            </form>
+        </div>
+
+        {% if followed %}
+            {% for follow in followed %}
+                <div class="user">
+                    <a href="{% url 'social_community:public_profile' user_id=follow.followed.id %}">
+                        <strong>{{ follow.followed.name }}</strong> ({{ follow.followed.email }})
+                    </a>
+                </div>
+            {% endfor %}
+        {% elif search_query %}
+            <p>No followed users found for "{{ search_query }}".</p>
+        {% else %}
+            <p>You are not following anyone yet.</p>
+        {% endif %}
+        <a href="{% url 'user_details' %}">Back to Dashboard</a>
+    </div>
+</body>
+</html>

@@ -1,0 +1,10 @@
+<h2>Confirm Booking</h2>
+<p>Are you sure you want to book: <strong>{{ package.package_name }}</strong>?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Confirm Booking</button>
+</form>
+
+<a href="{% url 'tour_package_list' %}">Back to Tour Packages</a>  <!-- ✅ Correct -->
+

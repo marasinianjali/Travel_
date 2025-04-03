@@ -1,0 +1,15 @@
+<!-- templates/bookings/booking_form.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>{% if booking %}Edit{% else %}Create{% endif %} Booking</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-primary">
+        {% if booking %}Update{% else %}Create{% endif %} Booking
+    </button>
+</form>
+{% endblock %}

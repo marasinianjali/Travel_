@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        }
+        h2 {
+            color: #333;
+        }
+        .guide-details {
+            margin-top: 20px;
+            text-align: left;
+        }
+        .guide-details p {
+            font-size: 16px;
+            margin: 10px 0;
+        }
+        .btn {
+            padding: 8px 12px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .btn-back {
+            background-color: #28a745;
+        }
+
+        /* Responsive design for mobile */
+        @media (max-width: 768px) {
+            .guide-details p {
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Guide Details</h2>
+
+        <div class="guide-details">
+            <p><strong>ID:</strong> {{ guide.id }}</p>
+            <p><strong>Name:</strong> {{ guide.name }}</p>
+            <p><strong>Email:</strong> {{ guide.email }}</p>
+            <p><strong>Location:</strong> {{ guide.location }}</p>
+            <p><strong>Experience:</strong> {{ guide.experience }} years</p>
+            <p><strong>Languages:</strong> {{ guide.languages }}</p>
+        </div>
+
+        <!-- Back to Guide List Button -->
+        <a href="{% url 'guide_list' %}" class="btn btn-back">Back to Guide List</a>
+    </div>
+</body>
+</html>

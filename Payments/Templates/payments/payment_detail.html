@@ -1,0 +1,21 @@
+<!-- payment_detail.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Payment Details</h2>
+
+<p>Payment ID: {{ payment.payment_id }}</p>
+<p>Booking ID: {{ payment.booking_id }}</p>
+<p>Name: {{ payment.name }}</p>
+<p>Hotel Name: {{ payment.hotel_name }}</p>
+<p>Phone Number: {{ payment.phone_number }}</p>
+<p>Amount: {{ payment.amount }}</p>
+<p>Payment Method: {{ payment.get_payment_method_display }}</p>
+<p>Status: {{ payment.get_status_display }}</p>
+<p>Transaction Date: {{ payment.transaction_date }}</p>
+
+<a href="{% url 'payment_update' payment.pk %}">Edit</a> |
+<a href="{% url 'payment_delete' payment.pk %}">Delete</a> |
+<a href="{% url 'payment_list' %}">Back to Payments</a>
+{% endblock %}

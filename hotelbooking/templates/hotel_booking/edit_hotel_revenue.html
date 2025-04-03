@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Hotel Revenue</title>
+</head>
+<body>
+
+<h2>Edit Revenue for {{ revenue.hotel_name }}</h2>
+
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}  <!-- This will render the form fields -->
+    <button type="submit">Save Changes</button>
+</form>
+
+
+
+</body>
+</html>

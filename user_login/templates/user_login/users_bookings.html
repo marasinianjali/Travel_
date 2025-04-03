@@ -1,0 +1,19 @@
+<h2>My Bookings</h2>
+<table border="1">
+    <tr>
+        <th>Package Name</th>
+        <th>Company</th>
+        <th>Amount</th>
+        <th>Booking Date</th>
+    </tr>
+
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking.package.package_name }}</td>
+        <td>{{ booking.package.company_name }}</td>
+        <td>{{ booking.package.amount }}</td>
+        <td>{{ booking.booking_date }}</td>
+    </tr>
+    {% endfor %}
+</table>
+<a href="{% url 'tour_package_list' %}">Back to Packages</a>
