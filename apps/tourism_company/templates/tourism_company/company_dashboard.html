@@ -1,0 +1,178 @@
+<style>
+    /* Basic Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Body Styles */
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f7fc;
+    color: #333;
+}
+
+/* Container */
+.container {
+    max-width: 1200px;
+    margin: 20px auto;
+    padding: 20px;
+}
+
+/* Heading Styles */
+h2 {
+    font-size: 2rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+/* Button Container */
+.btn {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+/* Card Style */
+.card {
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    margin-bottom: 20px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
+/* Card Header */
+.card h5 {
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+/* Card Text */
+.card p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Primary Card (For Logout) */
+.bg-primary {
+    background-color: #007bff;
+}
+
+/* Secondary Card (Tour Package) */
+.bg-secondary {
+    background-color: #6c757d;
+}
+
+/* Card Body */
+.card-body {
+    padding: 20px;
+}
+
+/* Button Styles */
+.btn-light {
+    background-color: #fff;
+    color: #333;
+    border-radius: 5px;
+    padding: 10px 20px;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    text-decoration: none;
+}
+
+.btn-light:hover {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Logout Button */
+.btn-logout {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Responsiveness */
+@media (max-width: 768px) {
+    .btn {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .col-md-4 {
+        width: 100%;
+        margin-bottom: 15px;
+    }
+}
+
+</style>
+
+
+
+{% block content %}
+<div class="container">
+    <h2>Company Dashboard</h2>
+   
+
+    <div class="btn">
+        <!-- Users -->
+        <div class="btn-logout">
+            <div class="card text-white bg-primary mb-3">
+                <div class="logout-body">
+                    
+                 <a href="{% url 'tourism_company:company_login' %}" class="btn btn-light">Logout</a>   
+                </div>
+            </div>
+        </div>
+        <!-- <p>User ID: {{ user_id }}</p>
+        <p>User Role: {{ user_role }}</p>
+        <p>User ID: {{ request.session.user_id }}</p>
+        <p>User Role: {{ request.session.user_role }}</p>
+    
+        -->
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Tour Packages</h5>
+                    <p class="card-text">{{ total_tour_packages }}</p>
+                    <!--Tour company can see and edit and delete packages-->
+                    <!--Tour company can add package but it will be need to be approve-->
+                    <a href="{% url 'tour_package:tour_package_list' %}" class="btn btn-light">View Packages</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Tour Packages Booking</h5>
+                    
+                    
+                    <a href="{% url 'tourism_company:company_bookings' %}" class="btn btn-light">View Total Bookings</a>
+
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-white bg-secondary mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Total Tour Packages</h5>
+                    <p class="card-text">{{ total_tour_packages }}</p>
+                    <!--Tour company can see and edit and delete packages-->
+                    <!--Tour company can add package but it will be need to be approve-->
+                    <a href="{% url 'tour_package:add_tour_package' %}" class="btn btn-light">Add Package</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

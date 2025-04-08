@@ -14,26 +14,27 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+
 from django.contrib import admin
 from django.urls import path, include
-from tour_package import views
+from apps.tour_package import views
 from django.conf import settings
 from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('user_login.urls')),
-    path('', include('tourism_company.urls')),
-    path('', include('tour_package.urls')), 
-    path('', include('Guides.urls')),
-    path('', include('hotelbooking.urls')),
-    path('', include('bookings.urls')),
-    path('', include('reviews.urls')),
-    path('', include('social_community.urls')),
-    path('', include('expense_tracker.urls')),
-    path('', include('travel_stories.urls')), 
-    path('maps/', include('maps.urls')),
+    path('', include(('apps.user_login.urls', 'user_login'), namespace='user_login')),
+    path('', include(('apps.tourism_company.urls', 'tourism_company'), namespace='tourism_company')),
+    path('', include(('apps.tour_package.urls', 'tour_package'), namespace='tour_package')),
+    path('', include(('apps.Guides.urls', 'Guides'), namespace='Guides')),
+    path('', include(('apps.hotelbooking.urls', 'hotelbooking'), namespace='hotelbooking')),
+    path('', include(('apps.bookings.urls', 'bookings'), namespace='bookings')),
+    path('', include(('apps.reviews.urls', 'reviews'), namespace='reviews')),
+    path('', include(('apps.social_community.urls', 'social_community'), namespace='social_community')),
+    path('', include(('apps.expense_tracker.urls', 'expense_tracker'), namespace='expense_tracker')),
+    path('maps/', include(('apps.maps.urls', 'maps'), namespace='maps')),
+    path('social_stories/', include(('apps.social_stories.urls', 'social_stories'), namespace='social_stories')),
 ]
 
 

@@ -1,0 +1,95 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <h1>Create Expense</h1>
+
+    <div class="form-container">
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn-submit">Save</button>
+        </form>
+    </div>
+
+    <div class="back-link">
+        <a href="{% url 'expense_tracker:expense_list' %}" class="btn-back">Back to Expense List</a>
+    </div>
+
+    <style>
+        /* Form Container */
+        .form-container {
+            max-width: 700px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: white;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        form input,
+        form select,
+        form textarea {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 100%;
+            margin: 5px 0;
+        }
+
+        form input:focus,
+        form select:focus,
+        form textarea:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Submit Button */
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #0056b3;
+        }
+
+        /* Back Link Styling */
+        .back-link {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .btn-back {
+            display: inline-block;
+            background-color: #6c757d;
+            padding: 10px 15px;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        .btn-back:hover {
+            background-color: #5a6268;
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,100 @@
+{% extends 'base_generic.html' %}
+
+{% block content %}
+    <h1>Delete Expense Report</h1>
+
+    <div class="delete-report">
+        <p>Are you sure you want to delete the expense report created by <strong>{{ report.user.username }}</strong> for the period 
+        <strong>{{ report.start_date }} to {{ report.end_date }}</strong>?</p>
+
+        <div class="report-info">
+            <p><strong>Total Expenses:</strong> {{ report.total_expenses }}</p>
+            <p><strong>Tour Package:</strong> {{ report.tour_package.package_name }}</p>
+        </div>
+
+        <form method="POST" action="{% url 'expense_tracker:delete_expense_report' report.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">Yes, Delete</button>
+            <a href="{% url 'expense_tracker:expense_report_list' %}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+
+    <style>
+        /* Container for the Delete Report */
+        .delete-report {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            box-shadow: 0px 0px 20px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+        }
+
+        /* Heading */
+        h1 {
+            text-align: center;
+            color: #333;
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        /* Confirmation Message */
+        .delete-report p {
+            font-size: 1.1rem;
+            color: #555;
+            margin-bottom: 15px;
+        }
+
+        /* Report Info */
+        .report-info {
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .report-info strong {
+            color: #333;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            display: inline-block;
+            margin-right: 10px;
+        }
+
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .delete-report {
+                padding: 15px;
+            }
+
+            .report-info {
+                margin-top: 15px;
+            }
+        }
+    </style>
+
+{% endblock %}

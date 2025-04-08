@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,7 +30,7 @@ STATICFILES_DIRS = [
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-(dw31(!jv=z!ev#55xtotunvxirkxrulb_rpu^k+g1#zclq&!z'
+SECRET_KEY = config('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -47,20 +48,19 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'user_login',
-    'tourism_company',
-    'tour_package',
-    'Guides',
-    'hotelbooking',
-    'bookings',
-    'reviews',
-    'Payments',
-    'social_community',
-    'expense_tracker',
-    'travel_stories',
-    'maps',
-
-]
+    'apps.user_login',
+    'apps.tourism_company',
+    'apps.tour_package',
+    'apps.Guides',
+    'apps.hotelbooking',
+    'apps.bookings',
+    'apps.reviews',
+    'apps.Payments',
+    'apps.social_community',
+    'apps.expense_tracker',
+    'apps.maps',
+    'apps.social_stories',
+]   
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -100,12 +100,12 @@ WSGI_APPLICATION = 'admin_module.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # MySQL database engine
-        'NAME': 'travel',  # Change this to your actual DB name
-        'USER': 'root',  # Your MySQL username
-        'PASSWORD': 'root',  # Your MySQL password
-        'HOST': 'localhost',  # Keep as 'localhost' if running MySQL locally
-        'PORT': '3306',  # Default MySQL port
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': config('DB_NAME'),
+        'USER': config('DB_USER'),
+        'PASSWORD': config('DB_PASSWORD'),
+        'HOST': config('DB_HOST'),
+        'PORT': config('DB_PORT'),
     }
 }
 

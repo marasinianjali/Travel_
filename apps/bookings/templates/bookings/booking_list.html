@@ -1,0 +1,35 @@
+<!-- templates/bookings/booking_list.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>All Bookings</h2>
+<a href="{% url 'bookings:create_booking' %}" class="btn btn-primary">Book Your Destination</a>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>User Name</th>
+        <th>Phone</th>
+        <th>Package</th>
+        <th>Guide</th>
+        <th>Booking Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+    </tr>
+    {% for booking in bookings %}
+    <tr>
+        <td>{{ booking.booking_id }}</td>
+        <td>{{ booking.user_name }}</td>
+        <td>{{ booking.phone_number }}</td>
+        <td>{{ booking.package }}</td>
+        <td>{{ booking.guide }}</td>
+        <td>{{ booking.booking_date }}</td>
+        <td>{{ booking.status }}</td>
+        <td>
+            <a href="{% url 'edit_booking' booking.booking_id %}" class="btn btn-warning">Edit</a>
+            <a href="{% url 'delete_booking' booking.booking_id %}" class="btn btn-danger">Delete</a>
+        </td>
+    </tr>
+    {% endfor %}
+</table>
+{% endblock %}

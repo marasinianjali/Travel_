@@ -1,0 +1,21 @@
+{% load static %}
+
+
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+
+<div class="auth-container">
+    <h3>User Login</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="{% url 'user_login:user-signup' %}">Signup here</a></p>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="message">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+</div>
