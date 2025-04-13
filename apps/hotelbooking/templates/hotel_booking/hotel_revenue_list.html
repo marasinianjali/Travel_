@@ -29,6 +29,14 @@
         .table td .btn {
             margin: 0 5px;
         }
+
+        .badge {
+            font-size: 0.9rem;
+        }
+
+        .btn {
+            margin: 0 2px;
+        }
     </style>
 </head>
 <body>
@@ -69,6 +77,10 @@
                         <a href="{% url 'edit_hotel_revenue' revenue.id %}" class="btn btn-sm btn-warning">Edit</a>
                         <a href="{% url 'delete_hotel_revenue' revenue.id %}" class="btn btn-sm btn-danger">Delete</a>
                     </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4">No revenue data available.</td>
                 </tr>
             {% endfor %}
         </tbody>

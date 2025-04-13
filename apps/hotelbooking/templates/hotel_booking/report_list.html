@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Hotel Reports</h2>
+{% comment %} <a href="{% url 'hotel_report_create' %}" class="btn btn-success">Add New Report</a> {% endcomment %}
+<table class="table">
+    <thead>
+        <tr>
+            <th>Hotel</th>
+            <th>Type</th>
+            <th>Date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for report in reports %}
+        <tr>
+            <td>{{ report.hotel_booking }}</td>
+            <td>{{ report.get_report_type_display }}</td>
+            <td>{{ report.report_date }}</td>
+            <td>
+                <a href="{% url 'hotel_report_update' report.pk %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'hotel_report_delete' report.pk %}" class="btn btn-danger">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

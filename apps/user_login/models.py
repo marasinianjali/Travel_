@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.hashers import make_password
 
+
 from apps.tour_package.models import TourPackage  # Importing TourPackage model
 
 class LoginAdmin(models.Model):
@@ -12,8 +13,8 @@ class LoginAdmin(models.Model):
     def __str__(self):
         return self.username
     
-    # class Meta:
-    #     db_table: 'Admin'
+    class Meta:
+        db_table = 'Admin'
 
 
 
@@ -98,13 +99,9 @@ class Notification(models.Model):
 
 #--------------THIS model is for users to book a tour package which is link
 #-------------- to views inside tour_package.views
-class Booking(models.Model):
+class BookingDetail(models.Model):
 
-     # user_id = models.IntegerField()  # Assuming session-based user IDs
-     # user_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings", null=True, blank=True)
-    # 
-    # user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings")
-
+    
     booking_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings", null=True, blank=True)
     package = models.ForeignKey(TourPackage, on_delete=models.CASCADE, related_name="user_bookings")  # Use related_name
@@ -117,8 +114,10 @@ class Booking(models.Model):
 
     def __str__(self):
         return f"Booking {self.booking_id} - {self.package.package_name}"
-    
     class Meta:
         db_table = 'user_login_booking'
+
+    
+   
     
     

@@ -2,15 +2,17 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.admin.views.decorators import staff_member_required
 from django.urls import reverse
+
+from apps.bookings.models import Booking
 from .models import TourPackage
-from apps.user_login.models import Booking
+from apps.user_login.models import BookingDetail
 from .forms import TourPackageForm
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
 from django.utils.timezone import now
 from django.contrib.auth.models import User 
-
-
+from apps.tourism_company.models import TourismCompany  
+from apps.user_login.models import BookingDetail, User
 
 
 
@@ -34,18 +36,32 @@ def tour_package_list(request):
     })
 
 
+from apps.tourism_company.models import TourismCompany  # import if needed
+
 def add_tour_package(request):
-    user_role = request.session.get('user_role')  # Get user role from session
+    user_role = request.session.get('user_role')  # e.g., 'admin' or 'company'
 
     if request.method == "POST":
         form = TourPackageForm(request.POST, user_role=user_role)
         if form.is_valid():
             package = form.save(commit=False)
-            package.is_approved = False  # Always set it to False for new packages
-            package.save()
-            return redirect('tour_package_list')  # Redirect after saving
+            package.is_approved = False  # Always False by default
+
+            # Assign company only if user is a tourism company
+            if user_role == 'company':
+                company_id = request.session.get('company_id')
+                if company_id:
+                    package.tourism_company_id = company_id
+                else:
+                        # fallback if something's wrong
+                    return HttpResponse("No company ID in session", status=400)
+        else:
+            return HttpResponse("Only companies can add packages", status=403)
+
+        package.save()
+        return redirect('tour_package:tour_package_list')
     else:
-        form = TourPackageForm(user_role=user_role)  # Pass role to form
+        form = TourPackageForm(user_role=user_role)
 
     return render(request, 'tour_packages/add_package.html', {'form': form})
 
@@ -67,10 +83,26 @@ def book_tour(request, package_id):
         if not user_id:
             print("Error: User ID not found in session!")
             return redirect("login")  # Redirect to login if session expired
-          # ✅ Fix: Ensure user exists
-        user = User.objects.get(id=user_id)
+
+            # Validate user_id
+        try:
+            user_id = int(user_id)  # Ensure user_id is an integer
+        except (ValueError, TypeError):
+            print(f"Error: Invalid user ID in session: {user_id}")
+            request.session.flush()
+            return redirect("login")
         
-        Booking.objects.create(user=user, package=package)
+        # Ensure user exists
+        try:
+            user = User.objects.get(id=user_id)
+        except User.DoesNotExist:
+            print(f"Error: User with ID {user_id} does not exist!")
+            request.session.flush()
+            return redirect("login")
+          # ✅ Fix: Ensure user exists
+        
+        
+        BookingDetail.objects.create(user=user, package=package)
 #-----------------------------------------------
        # Booking.objects.create(user_id=user_id, package=package)
         return redirect("user_bookings")  # Redirect to user bookings page
@@ -138,7 +170,7 @@ def edit_tour_package(request, package_id):
         form = TourPackageForm(request.POST, instance=package)
         if form.is_valid():
             form.save()
-            return redirect('tour_package_list')
+            return redirect('tour_package:tour_package_list')
     else:
         form = TourPackageForm(instance=package)
     return render(request, 'tour_packages/edit_package.html', {'form': form, 'package': package})

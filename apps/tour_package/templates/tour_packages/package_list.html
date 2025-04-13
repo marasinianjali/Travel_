@@ -65,11 +65,11 @@
             <!-- Only show Edit/Delete for Admins -->
             
             <td>
-                <a href="{% url 'edit_tour_package' package.package_id %}">Edit</a> 
-                <a href="{% url 'delete_tour_package' package.package_id %}">Delete</a>
+                <a href="{% url 'tour_package:edit_tour_package' package.package_id %}">Edit</a> 
+                <a href="{% url 'tour_package:delete_tour_package' package.package_id %}">Delete</a>
             
                 {% if not package.is_approved %}
-                <a href="{% url 'review_package' package.package_id %}">Review</a>
+                <a href="{% url 'tour_package:review_package' package.package_id %}">Review</a>
                 {% endif %} 
             
             </td>
@@ -78,7 +78,7 @@
          <!-- If package is not booked -->
                 {% if user_role == "User" %}
             <td>
-                <a href="{% url 'book_tour' package.package_id %}">Book</a>
+                <a href="{% url 'tour_package:book_tour' package.package_id %}">Book</a>
             </td>
         {% endif %}
     </tr>

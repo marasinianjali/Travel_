@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User 
+
 from apps.tour_package.models import TourPackage# If you want user-specific tracking
 
 

@@ -24,12 +24,11 @@
                 {% for room in rooms %}
                     <tr>
                         <td>{{ forloop.counter }}</td>
-                       
                         <td>{{ room.room_number }}</td>
                         <td>{{ room.room_type }}</td>
                         <td>${{ room.price_per_night }}</td>
                         <td>
-                            {% if room.is_available %}
+                            {% if room.status == 'Available' %}
                                 <span class="badge bg-success">Available</span>
                             {% else %}
                                 <span class="badge bg-danger">Booked</span>

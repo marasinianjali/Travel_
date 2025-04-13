@@ -111,16 +111,14 @@
     <div class="container">
         <h2>Tourism Companies List</h2>
 
-        <a href="{% url 'tourism_company_create' %}" class="create-btn">Create a new tourism company</a>
+        <!-- <a href="{% url 'tourism_company:tourism_company_create' %}" class="create-btn">Create a new tourism company</a> -->
 
         {% if companies %}
             <table>
                 <thead>
                     <tr>
                         <th>Company ID</th>
-                        <th>User Name</th>
-                        <th>User Phone</th>
-                        <th>User Email</th>
+                        
                         <th>Company Name</th>
                         <th>Company Phone</th>
                         <th>Company Address</th>
@@ -131,16 +129,14 @@
                     {% for company in companies %}
                         <tr>
                             <td>{{ company.company_id }}</td>
-                            <td>{{ company.user_name }}</td>
-                            <td>{{ company.user_phone }}</td>
-                            <td>{{ company.user_email }}</td>
+                            
                             <td>{{ company.company_name }}</td>
                             <td>{{ company.company_phone }}</td>
                             <td>{{ company.company_address }}</td>
                             <td>
                                 <div style="display: flex; gap: 10px;">
-                                    <a href="{% url 'tourism_company_update' company.pk %}" class="edit-btn">Edit</a>
-                                    <a href="{% url 'tourism_company_delete' company.pk %}" class="delete-btn">Delete</a>
+                                    <a href="{% url 'tourism_company:tourism_company_update' company.pk %}" class="edit-btn">Edit</a>
+                                    <a href="{% url 'tourism_company:tourism_company_delete' company.pk %}" class="delete-btn">Delete</a>
                                 </div>
                             </td>
                         </tr>

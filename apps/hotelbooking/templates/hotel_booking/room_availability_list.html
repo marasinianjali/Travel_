@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Room Availability</h2>
+    
+    <p>Total Room Availability: {{ total_room_availability }}</p>  <!-- Display total availability -->
+
+    {% comment %}
+    {% if hotel_id %}
+    <a href="{% url 'add_room_availability' hotel_id %}" class="btn btn-success mb-2">Add Availability</a>
+    {% else %}
+    <p>No hotel available for adding availability.</p>
+    {% endif %}
+    {% endcomment %}
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Room</th>
+                <th>Hotel</th>
+                <th>Date</th>  <!-- Removed Room Type column -->
+                <th>Is Available?</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for availability in availability_list %}
+            <tr>
+                <td>{{ availability.room.room_number }}</td>
+                <td>{{ availability.room.hotel.hotel_name }}</td>
+                <td>{{ availability.available_date }}</td>
+                <td>{{ availability.is_available|yesno:"Yes,No" }}</td>
+                <td>
+                    <a href="{% url 'edit_availability' availability.id %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'delete_availability' availability.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5">No availability records found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

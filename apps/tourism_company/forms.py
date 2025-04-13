@@ -10,6 +10,13 @@ class TourismCompanyForm(forms.ModelForm):
             'company_name', 'company_phone', 'company_address'
         ]
 
+class TourismCompanyCreateForm(forms.ModelForm):
+    class Meta:
+        model = TourismCompany
+        fields = [ 
+            'company_name', 'company_phone', 'company_address'
+        ]
+
 #This is for the company signup form 
 class CompanySignupForm(forms.ModelForm):
     # password = forms.CharField(widget=forms.PasswordInput)

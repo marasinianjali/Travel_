@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'apps.expense_tracker',
     'apps.maps',
     'apps.social_stories',
+    
 ]   
 
 MIDDLEWARE = [
@@ -150,3 +151,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#CUSTOM USER MODEL

@@ -16,10 +16,11 @@ class Migration(migrations.Migration):
             name='Booking',
             fields=[
                 ('booking_id', models.AutoField(primary_key=True, serialize=False)),
-                ('user_id', models.IntegerField()),
+                ('user_id', models.IntegerField()),  # Use correct User model
                 ('booking_date', models.DateTimeField(auto_now_add=True)),
                 ('status', models.CharField(choices=[('Pending', 'Pending'), ('Confirmed', 'Confirmed'), ('Cancelled', 'Cancelled')], default='Pending', max_length=20)),
                 ('package', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='user_bookings', to='tour_package.tourpackage')),
             ],
+            
         ),
     ]

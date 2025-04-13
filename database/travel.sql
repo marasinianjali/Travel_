@@ -144,6 +144,15 @@ CREATE TABLE TourismCompany(
     company_phone VARCHAR(255) NOT NULL,
     company_address VARCHAR(255) NOT NULL
 );
+ALTER TABLE TourismCompany
+ADD COLUMN password VARCHAR(128) NOT NULL;
+-- to show enable disable accounts 
+ALTER TABLE TourismCompany
+ADD COLUMN is_active TINYINT(1) DEFAULT 1;
+ALTER TABLE TourismCompany
+ADD COLUMN user_id INT,
+ADD CONSTRAINT fk_user_id FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE;
+
 
  
 
@@ -160,11 +169,16 @@ CREATE TABLE TourPackage (
     tour_type VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE TourPackage 
+ADD COLUMN company_id INT,
+ADD CONSTRAINT fk_company
+    FOREIGN KEY (company_id) REFERENCES TourismCompany(company_id);
+
 SELECT * FROM TourPackage;
 ALTER TABLE TourPackage ADD COLUMN company_name VARCHAR(255) NOT NULL;
 UPDATE TourPackage SET company_name = 'Default Company Name' WHERE company_name IS NULL;
-
 ALTER TABLE TourPackage ADD COLUMN is_approved BOOLEAN DEFAULT FALSE;
+
 #need is_approved for to see if admin approved the tour package or not
 SELECT * FROM TourPackage WHERE company_name IS NULL;
 SHOW COLUMNS FROM TourPackage LIKE 'company_name';
@@ -184,15 +198,17 @@ CREATE TABLE Guides (
     language VARCHAR(255) NOT NULL,
     amount  DECIMAL(10,2) NOT NULL CHECK (amount > 0),
     image longblob,
-    location VARCHAR(255) NOT NULL,
+    location VARCHAR(100) NOT NULL DEFAULT 'Nepal - Kathmandu',
     phone VARCHAR(20) NOT NULL,
     experience INT NOT NULL, 
     expertise TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE Guides
+ADD COLUMN location VARCHAR(100) NOT NULL DEFAULT 'Nepal - Kathmandu';
 
 SELECT * FROM Guides;
-
+-- not using for a now 
 CREATE TABLE HotelBooking(
 	hotel_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
@@ -207,6 +223,7 @@ CREATE TABLE HotelBooking(
     checkout_time DATETIME NOT NULL,
     FOREIGN KEY (user_id) REFERENCES User(id) ON DELETE CASCADE
 );
+
 
 CREATE TABLE Bookings (
     booking_id INT PRIMARY KEY AUTO_INCREMENT,

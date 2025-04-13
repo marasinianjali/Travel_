@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Hotel Amenities</h2>
+    
+    
+    {% for amenity in amenities %}
+        {% if amenity.hotel %}
+            <a href="{% url 'add_hotel_amenity' hotel_id=amenity.hotel.hotel_id %}" class="btn btn-success mb-2">Add Amenity</a>
+        {% else %}
+            <p>No hotel associated with this amenity.</p>
+        {% endif %}
+    {% endfor %}
+    
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Hotel</th>
+                <th>Amenity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for amenity in amenities %}
+            <tr>
+                <td>{{ amenity.hotel.hotel_name }}</td>
+                <td>{{ amenity.amenity }}</td>
+                <td>
+                    <a href="{% url 'edit_hotel_amenity' amenity.id %}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{% url 'delete_hotel_amenity' amenity.id %}" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="3">No amenities found.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

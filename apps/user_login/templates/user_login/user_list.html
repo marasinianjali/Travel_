@@ -34,9 +34,7 @@
                 <td>{{ user.email }}</td>
                 <td>{{ user.address }}</td>
                 <td>
-                    <a href="{% url 'view_user' user.user_id %}" class="btn btn-view">View</a>
-                    <a href="{% url 'update_user' user.user_id %}" class="btn btn-update">Update</a>
-                    <a href="{% url 'delete_user' user.user_id %}" class="btn btn-delete">Delete</a>
+                   
                 </td>
             </tr>
             {% endfor %}

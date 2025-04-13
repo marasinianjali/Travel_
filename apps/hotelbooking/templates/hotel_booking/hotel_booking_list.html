@@ -1,10 +1,223 @@
-<h2>Hotel Bookings</h2>
-<a href="{% url 'add_hotel_booking' %}">Add Booking</a>
-<ul>
-    {% for booking in bookings %}
-        <li>{{ booking.hotel_name }} - {{ booking.total_person }} people 
-            <a href="{% url 'edit_hotel_booking' booking.hotel_id %}">Edit</a> | 
-            <a href="{% url 'delete_hotel_booking' booking.hotel_id %}">Delete</a>
-        </li>
-    {% endfor %}
-</ul>
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hotel Bookings</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+        .search-form {
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .form-control {
+            width: 70%;
+            padding: 8px;
+            font-size: 16px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-search {
+            background-color: #007BFF;
+        }
+        .btn-search:hover {
+            background-color: #0056b3;
+        }
+        .btn-add {
+            background-color: #28a745;
+            padding: 10px 15px;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .btn-add:hover {
+            background-color: #218838;
+        }
+        .btn-edit {
+            background-color: #6c757d;
+            margin-left: 10px;
+        }
+        .btn-edit:hover {
+            background-color: #5a6268;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+            vertical-align: top;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        #map {
+            height: 400px;
+            width: 100%;
+            margin-top: 30px;
+        }
+        img.hotel-photo {
+            width: 100px;
+            height: auto;
+            border-radius: 6px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Hotel Bookings</h2>
+
+        <!-- Search Form -->
+        <form method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Search by hotel name..." value="{{ query }}" class="form-control">
+            <button type="submit" class="btn btn-search">Search</button>
+        </form>
+
+        <!-- Bookings Table -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Hotel Name</th>
+                    <th>Customer</th>
+                    <th>Email</th>
+                    <th>Contact</th>
+                    <th>Amount</th>
+                    <th>Total Price</th>
+                    <th>Persons</th>
+                    <th>Room Type</th>
+                    <th>Rooms Available</th>
+                    <th>Status</th>
+                    <th>Notify Admin</th>
+                    <th>Arrive Time</th>
+                    <th>Checkout Time</th>
+                    <th>Location</th>
+                    <th>Latitude</th>
+                    <th>Longitude</th>
+                    <th>Amenities</th>
+                    <th>Photo</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for booking in bookings %}
+                <tr>
+                    <td>{{ booking.hotel_name }}</td>
+                    <td>{{ booking.user.username }}</td>
+                    <td>{{ booking.email }}</td>
+                    <td>{{ booking.contact_number }}</td>
+                    <td>{{ booking.amount }}</td>
+                    <td>{{ booking.total_price }}</td>
+                    <td>{{ booking.total_person }}</td>
+                    <td>{{ booking.room_type }}</td>
+                    <td>{{ booking.rooms_available|yesno:"Yes,No" }}</td>
+                    <td>{{ booking.status }}</td>
+                    <td>{{ booking.notify_admin|yesno:"Yes,No" }}</td>
+                    <td>{{ booking.arrive_time|date:"Y-m-d H:i" }}</td>
+                    <td>
+                        {% if booking.checkout_time %}
+                            {{ booking.checkout_time|date:"Y-m-d H:i" }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </td>
+                    <td>{{ booking.hotel_address }}</td>
+                    <td>{{ booking.latitude|default:"N/A" }}</td>
+                    <td>{{ booking.longitude|default:"N/A" }}</td>
+                    <td>
+                        {% if booking.amenity %}
+                            <ul style="margin: 0; padding-left: 18px;">
+                                {% for code, name in booking.AMENITY_CHOICES %}
+                                    {% if code == booking.amenity %}
+                                        <li>{{ name }}</li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <span style="color: gray;">No amenities</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if booking.photo %}
+                            <img src="{{ booking.photo.url }}" alt="Hotel Photo" class="hotel-photo">
+                        {% else %}
+                            No photo
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="18" style="text-align: center; color: gray;">No bookings found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Action Buttons -->
+        <div style="margin-top: 20px;">
+            <a href="{% url 'hotelbooking:add_hotel_booking' %}" class="btn btn-add" onclick="return confirmBooking();">Add New Booking</a>
+            <a href="{% url 'hotelbooking:hotel_dashboard' %}" class="btn btn-edit">Back to Dashboard</a>
+        </div>
+
+        <!-- Map -->
+        <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        function confirmBooking() {
+            return confirm("Are you sure you want to add a new booking?");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var map = L.map('map').setView([28.3949, 84.1240], 6);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            var markers = [
+                {% for booking in bookings %}
+                    {% if booking.latitude and booking.longitude %}
+                        [{{ booking.latitude }}, {{ booking.longitude }}, "{{ booking.hotel_name|escapejs }}", "{{ booking.hotel_address|escapejs }}"]
+                    {% endif %}
+                {% endfor %}
+            ];
+
+            markers.forEach(function(marker) {
+                L.marker([marker[0], marker[1]]).addTo(map)
+                    .bindPopup("<b>" + marker[2] + "</b><br>" + marker[3] + "<br><i>Latitude:</i> " + marker[0] + "<br><i>Longitude:</i> " + marker[1]);
+            });
+        });
+    </script>
+</body>
+</html>

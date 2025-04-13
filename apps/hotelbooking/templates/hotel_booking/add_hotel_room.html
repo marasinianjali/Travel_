@@ -13,7 +13,17 @@
 
     <form method="POST">
         {% csrf_token %}
-        
+
+        <div class="mb-3">
+            <label for="hotel_id" class="form-label">Select Hotel</label>
+            <select name="hotel_id" id="hotel_id" class="form-select" required>
+                <option value="" disabled selected>Select a hotel</option>
+                {% for hotel in hotels %}
+                    <option value="{{ hotel.id }}">{{ hotel.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
         <div class="mb-3">
             <label for="room_number" class="form-label">Room Number</label>
             <input type="text" name="room_number" id="room_number" class="form-control" required>

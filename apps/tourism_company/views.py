@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
 from django.urls import reverse
+
+from apps.bookings.models import Booking
 from .models import TourismCompany
-from .forms import TourismCompanyForm, CompanySignupForm, CompanyLoginForm
+from .forms import TourismCompanyForm, CompanySignupForm, CompanyLoginForm, TourismCompanyCreateForm
 from apps.tour_package.models import TourPackage
-from apps.user_login.models import Booking
+from apps.user_login.models import BookingDetail
 # from django.contrib.auth.models import User
 from django.contrib.auth.models import User  
 
@@ -24,7 +26,7 @@ def company_signup(request):
             user = form.save(commit=False)
             # user.set_password(form.cleaned_data['password'])
             user.save()
-            return redirect('company_login')
+            return redirect('tourism_company:company_login')
     else:
         form = CompanySignupForm()
     return render(request, 'tourism_company/company_signup.html', {'form': form})
@@ -94,16 +96,15 @@ def company_dashboard_view(request):
 
 def company_bookings(request):
     if request.session.get("user_role") != "TourismCompany":
-        return redirect("dashboard")
+        return redirect("tourism_company:company_dashboard")
 
     company_name = request.session.get("company_name")  # Assuming this is how you store it
     if not company_name:
         print("Company name is missing from session!")
-        return redirect("dashboard")
+        return redirect("tourism_company:company_dashboard")
 
     # Filter bookings where the package's company matches the session company_name
-    bookings = Booking.objects.filter(package__company__name=company_name)
-
+    bookings = Booking.objects.filter(package__company__company_name=company_name)
     
     # Debugging
     for booking in bookings:
@@ -146,12 +147,12 @@ def tourism_company_list(request):
 
 def tourism_company_create(request):
     if request.method == 'POST':
-        form = TourismCompanyForm(request.POST)
+        form = TourismCompanyCreateForm(request.POST)
         if form.is_valid():
             form.save()
             return redirect('tourism_company_list')  # Redirect to the list view after saving
     else:
-        form = TourismCompanyForm()
+        form = TourismCompanyCreateForm()
     return render(request, 'tourism_company/tourism_company_form.html', {'form': form})
 
 

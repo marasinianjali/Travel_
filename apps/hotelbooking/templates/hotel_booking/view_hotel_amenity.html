@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h3>Amenities for {{ hotel.hotel_name }}</h3>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Amenity</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for amenity in amenities %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ amenity.amenity }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2">No amenities found.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <a href="{% url 'hotel_dashboard' %}" class="btn btn-secondary">Back to Dashboard</a>
+</div>
+{% endblock %}

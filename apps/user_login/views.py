@@ -48,7 +48,7 @@ def login_view(request):
                  # Set the user role for normal user
                 request.session['user_role'] = "Admin"  # Normal user role
                 #print(f"✅ Admin's User role set to  {request.session['user_role']}")
-                return redirect('admin-dashboard')  # Redirect to dashboard after login
+                return redirect('user_login:admin-dashboard')  # Redirect to dashboard after login
             else:
                 return HttpResponse("Invalid credentials, please try again.")
     else:
@@ -61,7 +61,7 @@ def login_view(request):
 def admin_logout_view(request):
     # Clear custom user session data
     request.session.flush()  # Logs out both session and Django user
-    return redirect('login')  # Redirect to login page
+    return redirect('user_login:login')  # Redirect to login page
 
 
 # ------------------ USER MANAGEMENT VIEWS ------------------
@@ -252,7 +252,7 @@ def user_logout_view(request):
 # User Dashboard View
 def user_dashboard_view(request):
     if "user_id" not in request.session:
-        return redirect("user-login")
+        return redirect("user_login:user-login")
     
     user = User.objects.get(id=request.session["user_id"])
     wishlist = Wishlist.objects.filter(user=user)
@@ -402,7 +402,7 @@ def user_details_view(request):
                     messages.success(request, f"You are now following {user_to_follow.name}.")
         except User.DoesNotExist:
             messages.error(request, "User does not exist.")
-        return redirect('user_details')
+        return redirect('user_login:user_details')
     
 
     return render(request, "user_login/user_details.html", {

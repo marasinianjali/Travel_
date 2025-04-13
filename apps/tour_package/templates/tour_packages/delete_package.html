@@ -7,5 +7,5 @@
     {% csrf_token %}
     <button type="submit">Yes, Delete</button>
 </form>
-<a href="{% url 'tour_package_list' %}">Cancel</a>
+<a href="{% url 'tour_package:tour_package_list' %}">Cancel</a>
 {% endblock %}

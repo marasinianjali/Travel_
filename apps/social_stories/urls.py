@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 app_name = 'travel_stories'
-
+# HERE travel_stories == social_stories (so dont touch it for now)
 urlpatterns = [
     path('', views.travel_stories_home, name='travel_stories_home'),
     path('category/<int:category_id>/', views.category_detail, name='category_detail'),

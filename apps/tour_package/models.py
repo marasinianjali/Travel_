@@ -1,12 +1,18 @@
 from django.db import models
+# tour_package/models.py
+from apps.tourism_company.models import TourismCompany
 
-class TourismCompany(models.Model):  # Assuming this is your company model
-    name = models.CharField(max_length=255)  
+
+
 
 class TourPackage(models.Model):
     package_id = models.AutoField(primary_key=True)
     package_name = models.CharField(max_length=255)
-    company = models.ForeignKey(TourismCompany, on_delete=models.CASCADE)  # Fix this!
+    company = models.ForeignKey(TourismCompany, 
+                                on_delete=models.CASCADE, 
+                                null=True, 
+                                blank=True,
+                                ) 
     date = models.DateField()
     description = models.TextField()
     amount = models.DecimalField(max_digits=10, decimal_places=2)
