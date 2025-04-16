@@ -99,25 +99,5 @@ class Notification(models.Model):
 
 #--------------THIS model is for users to book a tour package which is link
 #-------------- to views inside tour_package.views
-class BookingDetail(models.Model):
 
-    
-    booking_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="bookings", null=True, blank=True)
-    package = models.ForeignKey(TourPackage, on_delete=models.CASCADE, related_name="user_bookings")  # Use related_name
-    booking_date = models.DateTimeField(auto_now_add=True)
-    status = models.CharField(max_length=20, choices=[
-        ("Pending", "Pending"),
-        ("Confirmed", "Confirmed"),
-        ("Cancelled", "Cancelled")
-    ], default="Pending")
-
-    def __str__(self):
-        return f"Booking {self.booking_id} - {self.package.package_name}"
-    class Meta:
-        db_table = 'user_login_booking'
-
-    
-   
-    
     

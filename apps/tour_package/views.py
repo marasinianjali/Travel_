@@ -5,14 +5,14 @@ from django.urls import reverse
 
 from apps.bookings.models import Booking
 from .models import TourPackage
-from apps.user_login.models import BookingDetail
+
 from .forms import TourPackageForm
 from django.contrib.auth.decorators import user_passes_test
 from django.contrib.auth.models import Group
 from django.utils.timezone import now
 from django.contrib.auth.models import User 
 from apps.tourism_company.models import TourismCompany  
-from apps.user_login.models import BookingDetail, User
+from apps.user_login.models import  User
 
 
 
@@ -70,44 +70,6 @@ def add_tour_package(request):
 #---------------------------------------------------------
 # This view is for to book tour by user 
 
-def book_tour(request, package_id):
-    if request.session.get("user_role") != "User":
-        return redirect("dashboard")  # Only users can book
-    
-    package = TourPackage.objects.get(package_id=package_id)
-    
-    if request.method == "POST":
-        user_id = request.session.get("user_id")
-
-#------------------------------
-        if not user_id:
-            print("Error: User ID not found in session!")
-            return redirect("login")  # Redirect to login if session expired
-
-            # Validate user_id
-        try:
-            user_id = int(user_id)  # Ensure user_id is an integer
-        except (ValueError, TypeError):
-            print(f"Error: Invalid user ID in session: {user_id}")
-            request.session.flush()
-            return redirect("login")
-        
-        # Ensure user exists
-        try:
-            user = User.objects.get(id=user_id)
-        except User.DoesNotExist:
-            print(f"Error: User with ID {user_id} does not exist!")
-            request.session.flush()
-            return redirect("login")
-          # ✅ Fix: Ensure user exists
-        
-        
-        BookingDetail.objects.create(user=user, package=package)
-#-----------------------------------------------
-       # Booking.objects.create(user_id=user_id, package=package)
-        return redirect("user_bookings")  # Redirect to user bookings page
-    
-    return render(request, 'tour_packages/book_tour.html', {"package": package})
 
 
 

@@ -12,7 +12,7 @@ class Booking(models.Model):
     ]
 
     booking_id = models.AutoField(primary_key=True)
-    #user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     hotel = models.ForeignKey(HotelBooking, on_delete=models.CASCADE, null=True, blank=True)
     user_name = models.CharField(max_length=255)
     phone_number = models.CharField(max_length=20)
@@ -26,7 +26,8 @@ class Booking(models.Model):
     pickup_location = models.CharField(max_length=255)
 
     def __str__(self):
-        return f"Booking #{self.booking_id} - {self.user.username}"
+        return f"Booking #{self.booking_id} - {self.user.username if self.user else 'No User'}"
+
     
     # Telling django use this table 
     class Meta:

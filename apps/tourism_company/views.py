@@ -8,7 +8,7 @@ from apps.bookings.models import Booking
 from .models import TourismCompany
 from .forms import TourismCompanyForm, CompanySignupForm, CompanyLoginForm, TourismCompanyCreateForm
 from apps.tour_package.models import TourPackage
-from apps.user_login.models import BookingDetail
+
 # from django.contrib.auth.models import User
 from django.contrib.auth.models import User  
 
@@ -84,7 +84,7 @@ def company_logout(request):
 def company_dashboard_view(request):
     # Check if the company is logged in
     if 'company_id' not in request.session:
-        return redirect('company_login')  # Redirect to login if not logged in
+        return redirect('tourism_company:company_login')  # Redirect to login if not logged in
 
     return render(request, 'tourism_company/company_dashboard.html', {
         'user_role': request.session.get('user_role', 'Guest')

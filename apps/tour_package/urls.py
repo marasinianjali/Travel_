@@ -8,7 +8,7 @@ urlpatterns = [
     path('packages/add', views.add_tour_package, name='add_tour_package'),
    
 
-    path("book/<int:package_id>/", views.book_tour, name="book_tour"),
+
    
 
     path('packages/review/<int:package_id>', views.review_package, name='review_package'),

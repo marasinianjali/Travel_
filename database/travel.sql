@@ -245,6 +245,12 @@ CREATE TABLE Bookings (
     FOREIGN KEY (guide_id) REFERENCES Guides(guide_id) ON DELETE SET NULL
 );
 
+ALTER TABLE hotelbooking_hotelbooking
+ADD notify_admin TINYINT(1) NOT NULL DEFAULT 0,
+ADD status VARCHAR(50) NOT NULL DEFAULT 'Pending',
+ADD amenity VARCHAR(100) NOT NULL DEFAULT 'wifi';
+
+
 CREATE TABLE Reviews (
     review_id INT PRIMARY KEY AUTO_INCREMENT,
     user_id INT NOT NULL,
