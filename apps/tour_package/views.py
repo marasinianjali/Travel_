@@ -1,146 +1,128 @@
-from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.admin.views.decorators import staff_member_required
-from django.urls import reverse
-
-from apps.bookings.models import Booking
-from .models import TourPackage
-
-from .forms import TourPackageForm
-from django.contrib.auth.decorators import user_passes_test
-from django.contrib.auth.models import Group
+from django.contrib.auth.decorators import login_required, user_passes_test
+from django.http import HttpResponse, HttpResponseForbidden
 from django.utils.timezone import now
-from django.contrib.auth.models import User 
-from apps.tourism_company.models import TourismCompany  
-from apps.user_login.models import  User
+from .forms import TourPackageForm
+from .models import TourPackage
+from apps.bookings.models import Booking
+from apps.user_login.models import User
 
 
+# Custom check for admin
+def is_admin(user):
+    return user.is_superuser or hasattr(user, 'loginadmin')
 
-# Total Tour package list 
+
+# List all tour packages
 def tour_package_list(request):
     user_role = request.session.get('user_role')
 
     if user_role == "Admin":
-        packages = TourPackage.objects.all()  # Admin sees all packages
-        # Admin can modify the (delete and edit package)
+        packages = TourPackage.objects.all()
     elif user_role == "TourCompany":
-         # Get company name from session
-        packages = TourPackage.objects.filter(company_name=request.session.get('company_name'))  # Only their packages
+        company_name = request.session.get('company_name')
+        packages = TourPackage.objects.filter(company_name=company_name)
     else:
-        packages = TourPackage.objects.filter(is_approved=True)  # Regular users see only approved ones
+        packages = TourPackage.objects.filter(is_approved=True)
 
     return render(request, 'tour_packages/package_list.html', {
-        'packages': packages, 
+        'packages': packages,
         'user_role': user_role,
-        'today': now().date()  # Send today's date to template for past date disabling
+        'today': now().date()
     })
 
 
-from apps.tourism_company.models import TourismCompany  # import if needed
-
+# Add a new tour package
+@login_required
 def add_tour_package(request):
-    user_role = request.session.get('user_role')  # e.g., 'admin' or 'company'
+    user_role = request.session.get('user_role')
 
     if request.method == "POST":
         form = TourPackageForm(request.POST, user_role=user_role)
         if form.is_valid():
             package = form.save(commit=False)
-            package.is_approved = False  # Always False by default
+            package.is_approved = False
 
-            # Assign company only if user is a tourism company
-            if user_role == 'company':
+            if user_role == 'TourCompany':
                 company_id = request.session.get('company_id')
                 if company_id:
                     package.tourism_company_id = company_id
+                    package.save()
+                    return redirect('tour_package:tour_package_list')
                 else:
-                        # fallback if something's wrong
                     return HttpResponse("No company ID in session", status=400)
-        else:
-            return HttpResponse("Only companies can add packages", status=403)
-
-        package.save()
-        return redirect('tour_package:tour_package_list')
+            else:
+                return HttpResponse("Only tourism companies can add packages", status=403)
     else:
         form = TourPackageForm(user_role=user_role)
 
     return render(request, 'tour_packages/add_package.html', {'form': form})
 
 
-
-#---------------------------------------------------------
-# This view is for to book tour by user 
-
-
-
-
-# def book_tour(request, package_id):
-#     if request.session.get("user_role") != "User":
-#         return redirect("dashboard")  # Only users can book
-    
-#     package = TourPackage.objects.get(package_id=package_id)
-    
-#     if request.method == "POST":
-
- 
-#         user_id = request.session.get("user_id")
-
-#         # ✅ Check if user_id exists in session
-#         if not user_id:
-#             print("Error: User ID not found in session!")
-#             return redirect("login")  # Redirect to login if session expired
-
-#         # ✅ Fix: Ensure user exists
-#         user = User.objects.get(id=user_id)
-        
-#         Booking.objects.create(user=user, package=package)  # ✅ Fix: Use user instance
-#         return redirect("user_bookings")  # Redirect to user bookings page
-    
-#     return render(request, 'tour_packages/book_tour.html', {"package": package})
-
-
-#-----------------------------------------------------------------
-#review package 
-
-def review_package(request, package_id):
-    if request.session.get('user_role') != "Admin":
-        return redirect('tour_package_list')  # Redirect non-admins
-    
+# Edit a tour package
+@login_required
+def edit_tour_package(request, package_id):
     package = get_object_or_404(TourPackage, package_id=package_id)
+    form = TourPackageForm(request.POST or None, instance=package)
 
     if request.method == "POST":
-        package.is_approved = True  # Approve the package
-        package.save()
-        return redirect('tour_package_list')  # Redirect to list after approval
-
-    return render(request, 'tour_packages/review_package.html', {'package': package})
-
-#---------------------------------------------------------
-
-
-# This is for admin to approve package after company add packages
-@staff_member_required  # Only accessible by admin
-def approve_tour_package(request, package_id):
-    package = get_object_or_404(TourPackage, package_id=package_id)
-    package.is_approved = True  # Mark as approved
-    package.save()
-    return redirect('admin_tour_package_list')  # Redirect back to the list
-
-# View to edit a tour package
-def edit_tour_package(request, package_id):
-    package = TourPackage.objects.get(package_id=package_id)
-    if request.method == 'POST':
-        form = TourPackageForm(request.POST, instance=package)
         if form.is_valid():
             form.save()
             return redirect('tour_package:tour_package_list')
-    else:
-        form = TourPackageForm(instance=package)
-    return render(request, 'tour_packages/edit_package.html', {'form': form, 'package': package})
 
-# View to delete a tour package
+    return render(request, 'tour_packages/edit_package.html', {
+        'form': form,
+        'package': package
+    })
+
+
+# Delete a tour package
+@login_required
 def delete_tour_package(request, package_id):
-    package = TourPackage.objects.get(package_id=package_id)
-    if request.method == 'POST':
+    package = get_object_or_404(TourPackage, package_id=package_id)
+
+    if request.method == "POST":
         package.delete()
-        return redirect('tour_package_list')
+        return redirect('tour_package:tour_package_list')
+
     return render(request, 'tour_packages/delete_package.html', {'package': package})
+
+
+# Admin review & approval page
+@login_required
+@user_passes_test(is_admin)
+def review_package(request, package_id):
+    package = get_object_or_404(TourPackage, package_id=package_id)
+
+    if request.method == "POST":
+        package.is_approved = True
+        package.save()
+        return redirect('tour_package:tour_package_list')
+
+    return render(request, 'tour_packages/review_package.html', {'package': package})
+
+
+# Admin approve directly (staff-only)
+@login_required
+@user_passes_test(is_admin)
+def approve_tour_package(request, package_id):
+    package = get_object_or_404(TourPackage, package_id=package_id)
+    package.is_approved = True
+    package.save()
+    return redirect('admin_tour_package_list')
+
+
+# Book tour view 
+# @login_required
+# def book_tour(request, package_id):
+#     if request.session.get("user_role") != "User":
+#         return redirect("dashboard")
+#     package = get_object_or_404(TourPackage, package_id=package_id)
+#     if request.method == "POST":
+#         user_id = request.session.get("user_id")
+#         if not user_id:
+#             return redirect("login")
+#         user = get_object_or_404(User, id=user_id)
+#         Booking.objects.create(user=user, package=package)
+#         return redirect("user_bookings")
+#     return render(request, 'tour_packages/book_tour.html', {"package": package})

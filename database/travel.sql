@@ -1,5 +1,7 @@
 create database travel;
 use travel;
+
+
 SHOW TABLES;
 DESCRIBE categories;
 ALTER TABLE categories MODIFY id BIGINT AUTO_INCREMENT;
@@ -186,7 +188,7 @@ SHOW CREATE TABLE TourPackages;
 ALTER TABLE TourPackage DROP COLUMN company_name;
 
 
-
+DESCRIBE Guides;
 
 CREATE TABLE Guides (
     guide_id INT PRIMARY KEY AUTO_INCREMENT,

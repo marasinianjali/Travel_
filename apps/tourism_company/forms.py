@@ -1,32 +1,58 @@
 from django import forms
 from .models import TourismCompany
-from django.contrib.auth.forms import AuthenticationForm
+
 
 class TourismCompanyForm(forms.ModelForm):
     class Meta:
         model = TourismCompany
         fields = [
-            'user_name', 'user_phone', 'user_email', 
+            'user_name', 'user_phone', 'user_email',
             'company_name', 'company_phone', 'company_address'
         ]
+        widgets = {
+            'user_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'user_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'user_email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_address': forms.TextInput(attrs={'class': 'form-control'}),
+        }
+
 
 class TourismCompanyCreateForm(forms.ModelForm):
     class Meta:
         model = TourismCompany
-        fields = [ 
-            'company_name', 'company_phone', 'company_address'
-        ]
+        fields = ['company_name', 'company_phone', 'company_address']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_address': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
-#This is for the company signup form 
+
 class CompanySignupForm(forms.ModelForm):
-    # password = forms.CharField(widget=forms.PasswordInput)
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'class': 'form-control'}),
+        label="Password"
+    )
 
     class Meta:
         model = TourismCompany
-        fields = [ 'company_name', 'company_phone', 'company_address']
+        fields = ['company_name', 'company_phone', 'company_address', 'password']
+        widgets = {
+            'company_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_phone': forms.TextInput(attrs={'class': 'form-control'}),
+            'company_address': forms.TextInput(attrs={'class': 'form-control'}),
+        }
 
-#this is for company to login 
+
 class CompanyLoginForm(forms.Form):
-    company_name = forms.CharField(label="Company Name", max_length=255)
-    # company_phone = forms.CharField(label="Company Phone", max_length=255)
-    # company_address = forms.CharField(label="Company Address", max_length=255)
+    company_name = forms.CharField(
+        label="Company Name",
+        max_length=255,
+        widget=forms.TextInput(attrs={'class': 'form-control'})
+    )
+    password = forms.CharField(
+        label="Password",
+        widget=forms.PasswordInput(attrs={'class': 'form-control'})
+    )

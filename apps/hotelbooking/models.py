@@ -1,152 +1,172 @@
+
 from django.db import models
 from django.contrib.auth.models import User
 from apps.maps.models import Location
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
+from django.utils.text import slugify
 from django.utils import timezone
 from datetime import date
 
-def default_checkout_time():
-    return timezone.now() + timezone.timedelta(days=1)
+# Language model for normalization
+class Language(models.Model):
+    name = models.CharField(max_length=50, unique=True, verbose_name="Language Name")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Language"
+        verbose_name_plural = "Languages"
+
+
+# Abstract Base Class for reusable fields
+class GuideBase(models.Model):
+    name = models.CharField(max_length=255, unique=True, verbose_name="Full Name", help_text="Enter the full name of the guide.")
+    slug = models.SlugField(unique=True, blank=True, verbose_name="Slug")
+    profile_picture = models.ImageField(upload_to='guide_profiles/', blank=True, help_text="Upload a profile picture.", verbose_name="Profile Picture")
+    rating = models.FloatField(default=0.0, validators=[MinValueValidator(0.0), MaxValueValidator(5.0)], verbose_name="Rating")
+    experience_years = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(50)], help_text="Enter years of experience.", verbose_name="Years of Experience")
+    languages = models.ManyToManyField(Language, help_text="Select the languages spoken by the guide.", verbose_name="Languages Spoken")
+
+    class Meta:
+        abstract = True
+        verbose_name = "Guide Base"
+        verbose_name_plural = "Guide Bases"
+
+    def clean(self):
+        if self.experience_years < 0 or self.experience_years > 50:
+            raise ValidationError("Experience must be between 0 and 50 years.")
+        
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
+# Example Guide model extending the abstract base
+class Guide(GuideBase):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='guide_profile', verbose_name="User Profile")
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = "Guide"
+        verbose_name_plural = "Guides"
+
 
 class HotelBooking(models.Model):
     AMENITY_CHOICES = [
-        ('wifi', 'WiFi'),
-        ('ac', 'Air Conditioning'),
-        ('breakfast', 'Breakfast'),
-        ('pool', 'Swimming Pool'),
-        ('parking', 'Parking'),
-        ('gym', 'Gym'),
-        ('spa', 'Spa'),
-        ('tv', 'Television'),
-        ('minibar', 'Minibar'),
+        ('wifi', 'WiFi'), ('ac', 'Air Conditioning'), ('breakfast', 'Breakfast'),
+        ('pool', 'Swimming Pool'), ('parking', 'Parking'), ('gym', 'Gym'),
+        ('spa', 'Spa'), ('tv', 'Television'), ('minibar', 'Minibar'),
     ]
-    
+    ROOM_TYPE_CHOICES = [('Deluxe', 'Deluxe'), ('Suite', 'Suite'), ('Standard', 'Standard')]
 
-    hotel_id = models.AutoField(primary_key=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    hotel_name = models.CharField(max_length=255)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    photo = models.ImageField(upload_to="hotel_photos/", null=True, blank=True)
-    hotel_address = models.CharField(max_length=255)
-    contact_number = models.CharField(max_length=20)
-    total_person = models.IntegerField(default=1)  # Default to 1 person
-    arrive_time = models.DateTimeField(default=timezone.now)  # Default to current time
-    checkout_time = models.DateTimeField(default=default_checkout_time)  # Default to 1 day after now``
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True)
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True    , blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    email = models.EmailField(default='placeholder@example.com')
-    ROOM_TYPE_CHOICES = [
-        ('Deluxe', 'Deluxe'),
-        ('Suite', 'Suite'),
-        ('Standard', 'Standard'),
-    ]
-    room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES)
+    hotel_id = models.AutoField(primary_key=True, verbose_name="Hotel ID")
+    user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
+    hotel_name = models.CharField(max_length=255, verbose_name="Hotel Name")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], verbose_name="Amount")
+    photo = models.ImageField(upload_to="hotel_photos/", null=True, blank=True, verbose_name="Hotel Photo")
+    hotel_address = models.CharField(max_length=255, verbose_name="Hotel Address")
+    contact_number = models.CharField(max_length=20, verbose_name="Contact Number")
+    total_person = models.IntegerField(validators=[MinValueValidator(1)], verbose_name="Total Persons")
+    arrive_time = models.DateTimeField(verbose_name="Arrival Time")
+    checkout_time = models.DateTimeField(verbose_name="Checkout Time")
+    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total Price")
+    location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, verbose_name="Hotel Location")
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Latitude")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Longitude")
+    email = models.EmailField(verbose_name="Email Address")
+    room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES, verbose_name="Room Type")
     rooms_available = models.BooleanField(default=True, verbose_name="Rooms Available")
-    notify_admin = models.BooleanField(default=False)
+    notify_admin = models.BooleanField(default=False, verbose_name="Notify Admin")
     status = models.CharField(
-    max_length=50,
-    choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Pending', 'Pending')],
-    default='Pending'  # Default value
-)
-
-
-
-
-
-    # ✅ New field for amenities
-    amenity = models.CharField(max_length=100, choices=AMENITY_CHOICES, default='wifi')
+        max_length=50,
+        choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Pending', 'Pending')],
+        default='Pending', verbose_name="Booking Status"
+    )
+    amenity = models.CharField(max_length=100, choices=AMENITY_CHOICES, verbose_name="Hotel Amenity")
 
     def __str__(self):
         return f"Hotel Booking at {self.hotel_name} - {self.user.username}"
 
     def clean(self):
-      if self.amount <= 0:
-        raise ValidationError("Amount must be greater than 0.")
+        if self.checkout_time <= self.arrive_time:
+            raise ValidationError("Checkout time must be after arrive time.")
 
-     
-      if self.total_person <= 0:
-        raise ValidationError("Total persons must be at least 1.")
+    class Meta:
+        verbose_name = "Hotel Booking"
+        verbose_name_plural = "Hotel Bookings"
+
 
 class HotelRoom(models.Model):
-    ROOM_TYPE_CHOICES = [
-        ('Deluxe', 'Deluxe'),
-        ('Suite', 'Suite'),
-        ('Standard', 'Standard'),
-    ]
-    room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES)
+    ROOM_TYPE_CHOICES = [('Deluxe', 'Deluxe'), ('Suite', 'Suite'), ('Standard', 'Standard')]
 
-    room_number = models.CharField(max_length=100)
-    
-    price_per_night = models.DecimalField(max_digits=10, decimal_places=2)
-    description = models.CharField(max_length=200)
+    room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES, verbose_name="Room Type")
+    room_number = models.CharField(max_length=100, verbose_name="Room Number")
+    price_per_night = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], verbose_name="Price per Night")
+    description = models.CharField(max_length=200, verbose_name="Room Description")
     status = models.CharField(
         max_length=50,
         choices=[('Available', 'Available'), ('Booked', 'Booked'), ('Occupied', 'Occupied')],
-        default='Available'
+        default='Available', verbose_name="Room Status"
     )
-    hotel = models.ForeignKey('HotelBooking', on_delete=models.CASCADE, related_name='rooms')
-    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
-    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    hotel = models.ForeignKey('HotelBooking', on_delete=models.CASCADE, related_name='rooms', verbose_name="Hotel")
+    latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Latitude")
+    longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Longitude")
 
     def __str__(self):
         return f"Room {self.room_number} ({self.room_type})"
 
-    def clean(self):
-        # Additional validation for price
-        if self.price_per_night <= 0:
-            raise ValidationError("Price per night must be greater than 0.")
+    class Meta:
+        verbose_name = "Hotel Room"
+        verbose_name_plural = "Hotel Rooms"
 
-
-# Model to track hotel amenities (WiFi, AC, Breakfast, etc.)
-# models.py
-
-
-    
-
-# Room Availability model to track availability per date
 
 class RoomAvailability(models.Model):
-    
-    room = models.ForeignKey(HotelRoom, on_delete=models.CASCADE, related_name='availabilities')
-    available_date = models.DateField()
-    is_available = models.BooleanField(default=True)
+    room = models.ForeignKey(HotelRoom, on_delete=models.CASCADE, related_name='availabilities', verbose_name="Room")
+    available_date = models.DateField(verbose_name="Available Date")
+    is_available = models.BooleanField(default=True, verbose_name="Is Available")
 
     def __str__(self):
         return f"Availability for Room {self.room.room_number} on {self.available_date}"
 
     def clean(self):
-        # Ensure availability date is in the future
         if self.available_date < date.today():
             raise ValidationError("Availability date cannot be in the past.")
 
-# Revenue model to track hotel revenue
-
+    class Meta:
+        verbose_name = "Room Availability"
+        verbose_name_plural = "Room Availabilities"
 
 
 class HotelRevenue(models.Model):
-    hotel_name = models.CharField(max_length=255)
-    amount = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=50)
-    
+    hotel_name = models.CharField(max_length=255, verbose_name="Hotel Name")
+    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], verbose_name="Amount")
+    status = models.CharField(max_length=50, verbose_name="Status")
+
+    class Meta:
+        verbose_name = "Hotel Revenue"
+        verbose_name_plural = "Hotel Revenues"
+
+
 class HotelReport(models.Model):
-    REPORT_CHOICES = [
-        ('Revenue', 'Revenue'),
-        ('Availability', 'Room Availability'),
-    ]
-    hotel_booking = models.ForeignKey(HotelBooking, on_delete=models.CASCADE, related_name='reports')
-    report_type = models.CharField(max_length=50, choices=REPORT_CHOICES)
-    report_date = models.DateField(default=timezone.now)
-    report_data = models.JSONField()
+    REPORT_CHOICES = [('Revenue', 'Revenue'), ('Availability', 'Room Availability')]
+
+    hotel_booking = models.ForeignKey(HotelBooking, on_delete=models.CASCADE, related_name='reports', verbose_name="Hotel Booking")
+    report_type = models.CharField(max_length=50, choices=REPORT_CHOICES, verbose_name="Report Type")
+    report_date = models.DateField(default=timezone.now, verbose_name="Report Date")
+    report_data = models.JSONField(verbose_name="Report Data")
 
     def __str__(self):
         return f"Report: {self.get_report_type_display()} for {self.hotel_booking.hotel_name} on {self.report_date}"
 
     def clean(self):
-        # Validate that report data is not empty
         if not self.report_data:
             raise ValidationError("Report data cannot be empty.")
-        
-        
-        
+
+    class Meta:
+        verbose_name = "Hotel Report"
+        verbose_name_plural = "Hotel Reports"

@@ -2,8 +2,9 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 from django.core.exceptions import ValidationError
-
+from django.utils.text import slugify
 # Abstract base model for common fields
+
 class BasePerson(models.Model):
     name = models.CharField(
         max_length=100,
@@ -41,6 +42,8 @@ class Language(models.Model):
 
 
 class Guide(BasePerson):
+    guide_id = models.AutoField(primary_key=True) 
+    
     MALE = 'Male'
     FEMALE = 'Female'
     OTHER = 'Other'
@@ -81,9 +84,10 @@ class Guide(BasePerson):
         help_text="Brief summary about the guide."
     )
     languages = models.ManyToManyField(
-        Language,
+        to='Language',
         verbose_name="Languages Spoken",
-        help_text="Select all languages spoken by the guide."
+        help_text="Comma-separated languages spoken by the guide."
+
     )
     location = models.CharField(
         max_length=100,
@@ -100,25 +104,20 @@ class Guide(BasePerson):
         verbose_name="Areas of Expertise",
         help_text="Enter the guide's key strengths, regions, or specialties."
     )
-    payment = models.DecimalField(
+    amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
+        default=1000.00,  
         validators=[MinValueValidator(0.01)],
         verbose_name="Payment Rate",
         help_text="Set the standard rate per assignment."
     )
-    profile_picture = models.ImageField(
-        upload_to='guide_profiles/',
-        blank=True,
-        verbose_name="Profile Picture",
-        help_text="Upload a profile picture."
-    )
-    image = models.ImageField(
-        upload_to='guides/',
+   
+    image = models.BinaryField(
         null=True,
         blank=True,
-        verbose_name="Additional Image",
-        help_text="Optional additional guide image."
+        verbose_name="Profile Image",
+        help_text="Guide's image stored as binary data."
     )
     rating = models.FloatField(
         default=0.0,
@@ -131,7 +130,12 @@ class Guide(BasePerson):
         verbose_name="Created At",
         help_text="Timestamp of when the guide was added."
     )
-
+    slug = models.SlugField(
+        blank=True,
+        null=True,
+        unique=False,
+        help_text="Auto-generated slug from name"
+    )
     def __str__(self):
         return self.name
 

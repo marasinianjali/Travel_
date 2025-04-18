@@ -1,135 +1,243 @@
 from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib import messages
 from .models import Expense, ExpenseCategory, ExpenseReport
 from .forms import ExpenseForm, ExpenseCategoryForm, ExpenseReportForm
-from django.http import HttpResponse
 
-# Create Expense
-def create_expense(request):
-    if request.method == 'POST':
-        form = ExpenseForm(request.POST)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Expense created successfully!')
-            return redirect('expense_tracker:expense_list')  # Redirect to expense list page
+
+# Custom test function to check if the user is an admin
+def is_admin(user):
+    return user.is_superuser or hasattr(user, "loginadmin")
+
+
+# List all expense categories (limited to 10)
+def expense_category_list(request):
+    query = request.GET.get("search", "")
+    if query:
+        categories = ExpenseCategory.objects.filter(name__icontains=query)[:10]
     else:
-        form = ExpenseForm()
-    return render(request, 'expense_tracker/create_expense.html', {'form': form})
+        categories = ExpenseCategory.objects.all()[:10]
+    return render(
+        request,
+        "expense_tracker/expense_category_list.html",
+        {"categories": categories},
+    )
 
-# List Expenses
-def expense_list(request):
-    expenses = Expense.objects.all()
-    return render(request, 'expense_tracker/expense_list.html', {'expenses': expenses})
 
-# Update Expense
-def update_expense(request, pk):
-    expense = get_object_or_404(Expense, pk=pk)
-    if request.method == 'POST':
-        form = ExpenseForm(request.POST, instance=expense)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Expense updated successfully!')
-            return redirect('expense_tracker:expense_list')
-    else:
-        form = ExpenseForm(instance=expense)
-    return render(request, 'expense_tracker/create_expense.html', {'form': form})
-
-# Delete Expense
-def delete_expense(request, pk):
-    expense = get_object_or_404(Expense, pk=pk)
-    expense.delete()
-    messages.success(request, 'Expense deleted successfully!')
-    return redirect('expense_tracker:expense_list')
-
-# Create ExpenseCategory
+# Create expense category - admin only
+@login_required
+@user_passes_test(is_admin)
 def create_expense_category(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ExpenseCategoryForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Expense Category created successfully!')
-            return redirect('expense_tracker:expense_category_list')
+            messages.success(request, "Expense category created successfully!")
+            return redirect("expense_tracker:expense_category_list")
+        else:
+            return render(
+                request,
+                "expense_tracker/create_expense_category.html",
+                {"form": form},
+            )
     else:
         form = ExpenseCategoryForm()
-    return render(request, 'expense_tracker/create_expense_category.html', {'form': form})
+    return render(
+        request, "expense_tracker/create_expense_category.html", {"form": form}
+    )
 
-# List Expense Categories
-def expense_category_list(request):
-    categories = ExpenseCategory.objects.all()
-    return render(request, 'expense_tracker/expense_category_list.html', {'categories': categories})
 
-# Update ExpenseCategory
+# Update expense category - admin only
+@login_required
+@user_passes_test(is_admin)
 def update_expense_category(request, pk):
     category = get_object_or_404(ExpenseCategory, pk=pk)
-    if request.method == 'POST':
-        form = ExpenseCategoryForm(request.POST, instance=category)
+    form = ExpenseCategoryForm(request.POST or None, instance=category)
+    if request.method == "POST":
         if form.is_valid():
             form.save()
-            messages.success(request, 'Expense Category updated successfully!')
-            return redirect('expense_tracker:expense_category_list')
-    else:
-        form = ExpenseCategoryForm(instance=category)
-    return render(request, 'expense_tracker/create_expense_category.html', {'form': form})
+            messages.success(request, "Expense category updated successfully!")
+            return redirect("expense_tracker:expense_category_list")
+        else:
+            return render(
+                request,
+                "expense_tracker/create_expense_category.html",
+                {"form": form, "category": category},
+            )
+    return render(
+        request,
+        "expense_tracker/create_expense_category.html",
+        {"form": form, "category": category},
+    )
 
-# Delete ExpenseCategory
+
+# Delete expense category - admin only
+@login_required
+@user_passes_test(is_admin)
 def delete_expense_category(request, pk):
     category = get_object_or_404(ExpenseCategory, pk=pk)
-    category.delete()
-    messages.success(request, 'Expense Category deleted successfully!')
-    return redirect('expense_tracker:expense_category_list')
+    if request.method == "POST":
+        category.delete()
+        messages.success(request, "Expense category deleted successfully!")
+        return redirect("expense_tracker:expense_category_list")
+    return render(
+        request,
+        "expense_tracker/expense_category_confirm_delete.html",
+        {"category": category},
+    )
 
-# Create Expense Report
+
+# List all expenses (limited to 10)
+def expense_list(request):
+    query = request.GET.get("search", "")
+    if query:
+        expenses = Expense.objects.filter(description__icontains=query)[:10]
+    else:
+        expenses = Expense.objects.all()[:10]
+    return render(
+        request, "expense_tracker/expense_list.html", {"expenses": expenses}
+    )
+
+
+# Create expense - admin only
+@login_required
+@user_passes_test(is_admin)
+def create_expense(request):
+    if request.method == "POST":
+        form = ExpenseForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Expense created successfully!")
+            return redirect("expense_tracker:expense_list")
+        else:
+            return render(
+                request, "expense_tracker/create_expense.html", {"form": form}
+            )
+    else:
+        form = ExpenseForm()
+    return render(
+        request, "expense_tracker/create_expense.html", {"form": form}
+    )
+
+
+# Update expense - admin only
+@login_required
+@user_passes_test(is_admin)
+def update_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    form = ExpenseForm(request.POST or None, instance=expense)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Expense updated successfully!")
+            return redirect("expense_tracker:expense_list")
+        else:
+            return render(
+                request,
+                "expense_tracker/create_expense.html",
+                {"form": form, "expense": expense},
+            )
+    return render(
+        request,
+        "expense_tracker/create_expense.html",
+        {"form": form, "expense": expense},
+    )
+
+
+# Delete expense - admin only
+@login_required
+@user_passes_test(is_admin)
+def delete_expense(request, pk):
+    expense = get_object_or_404(Expense, pk=pk)
+    if request.method == "POST":
+        expense.delete()
+        messages.success(request, "Expense deleted successfully!")
+        return redirect("expense_tracker:expense_list")
+    return render(
+        request,
+        "expense_tracker/expense_confirm_delete.html",
+        {"expense": expense},
+    )
+
+
+# List all expense reports (limited to 10)
+def expense_report_list(request):
+    query = request.GET.get("search", "")
+    if query:
+        reports = ExpenseReport.objects.filter(user__username__icontains=query)[:10]
+    else:
+        reports = ExpenseReport.objects.all()[:10]
+    return render(
+        request, "expense_tracker/expense_report_list.html", {"reports": reports}
+    )
+
+
+# View single expense report
+def view_expense_report(request, pk):
+    report = get_object_or_404(ExpenseReport, pk=pk)
+    return render(
+        request, "expense_tracker/view_expense_report.html", {"report": report}
+    )
+
+
+# Create expense report - admin only
+@login_required
+@user_passes_test(is_admin)
 def create_expense_report(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = ExpenseReportForm(request.POST)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Expense Report created successfully!')
-            return redirect('expense_tracker:expense_report_list')
+            messages.success(request, "Expense report created successfully!")
+            return redirect("expense_tracker:expense_report_list")
+        else:
+            return render(
+                request,
+                "expense_tracker/create_expense_report.html",
+                {"form": form},
+            )
     else:
         form = ExpenseReportForm()
-    return render(request, 'expense_tracker/create_expense_report.html', {'form': form})
+    return render(
+        request, "expense_tracker/create_expense_report.html", {"form": form}
+    )
 
-# List Expense Reports
-def expense_report_list(request):
-    reports = ExpenseReport.objects.all()
-    return render(request, 'expense_tracker/expense_report_list.html', {'reports': reports})
 
-# Update Expense Report
+# Update expense report - admin only
+@login_required
+@user_passes_test(is_admin)
 def update_expense_report(request, pk):
     report = get_object_or_404(ExpenseReport, pk=pk)
-    if request.method == 'POST':
-        form = ExpenseReportForm(request.POST, instance=report)
+    form = ExpenseReportForm(request.POST or None, instance=report)
+    if request.method == "POST":
         if form.is_valid():
             form.save()
-            messages.success(request, 'Expense Report updated successfully!')
-            return redirect('expense_tracker:expense_report_list')
-    else:
-        form = ExpenseReportForm(instance=report)
-    return render(request, 'expense_tracker/create_expense_report.html', {'form': form, 'report': report})
+            messages.success(request, "Expense report updated successfully!")
+            return redirect("expense_tracker:expense_report_list")
+        else:
+            return render(
+                request,
+                "expense_tracker/create_expense_report.html",
+                {"form": form, "report": report},
+            )
+    return render(
+        request,
+        "expense_tracker/create_expense_report.html",
+        {"form": form, "report": report},
+    )
 
-# Delete Expense Report
-from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib import messages
-from .models import ExpenseReport
 
+# Delete expense report - admin only
+@login_required
+@user_passes_test(is_admin)
 def delete_expense_report(request, pk):
-    # Get the expense report or return 404 if not found
     report = get_object_or_404(ExpenseReport, pk=pk)
-
-    # Check if the request method is POST, which means the user confirmed deletion
-    if request.method == 'POST':
-        # Delete the expense report
+    if request.method == "POST":
         report.delete()
-
-        # Display a success message
-        messages.success(request, 'Expense Report deleted successfully!')
-
-        # Redirect to the list of expense reports
-        return redirect('expense_tracker:expense_report_list')
-
-    # If the request is GET, show the confirmation page
-    return render(request, 'expense_tracker/delete_expense_report.html', {'report': report})
-def view_expense_report(request, pk):
-    report = get_object_or_404(ExpenseReport, pk=pk)
-    return render(request, 'expense_tracker/view_expense_report.html', {'report': report})
+        messages.success(request, "Expense report deleted successfully!")
+        return redirect("expense_tracker:expense_report_list")
+    return render(
+        request,
+        "expense_tracker/expense_report_confirm_delete.html",
+        {"report": report},
+    )

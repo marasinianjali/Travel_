@@ -1,18 +1,15 @@
+
+
 from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from django.contrib.auth.models import User as AuthUser  # Django's built-in User model
+from django.contrib.auth.models import User as AuthUser
 from .models import User, Wishlist, Trip, Notification
-from .forms import WishlistForm, TripForm, ProfileUpdateForm, NotificationForm
+from .forms import WishlistForm, TripForm, ProfileUpdateForm, NotificationForm, UserForm, SignupForm, LoginForm, UserLoginForm
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
-from django.db import connection  # To run raw SQL queries
-
-# URLS FOR USER LOGIN AND SIGNUP
-from .forms import UserForm, SignupForm, LoginForm, UserLoginForm
-
-# Import models for dashboard stats
+from django.db import connection
 from apps.bookings.models import Booking
 from apps.Guides.models import Guide
 from apps.reviews.models import Review
@@ -20,20 +17,12 @@ from apps.Payments.models import Payment
 from apps.tour_package.models import TourPackage
 from apps.tourism_company.models import TourismCompany
 from django.contrib.auth.hashers import check_password
-
 from apps.social_community.models import Follow
 from apps.social_community.forms import FollowUserForm
-
-#EXPENSES VIEWS
-from apps.expense_tracker.models import Expense, ExpenseCategory, ExpenseReport
-from django.db import connection  # To run raw SQL queries
-from django.views.generic import ListView
-from apps.expense_tracker.models import ExpenseCategory
-from apps.expense_tracker.models import ExpenseReport
-
 from apps.social_community.models import Post
-# ------------------ AUTHENTICATION VIEWS ------------------
+from django.views.generic import ListView
 
+# ------------------ AUTHENTICATION VIEWS ------------------
 
 # Login View
 def login_view(request):
@@ -45,29 +34,22 @@ def login_view(request):
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
-                 # Set the user role for normal user
                 request.session['user_role'] = "Admin"  # Normal user role
-                #print(f"✅ Admin's User role set to  {request.session['user_role']}")
                 return redirect('user_login:admin-dashboard')  # Redirect to dashboard after login
             else:
-                return HttpResponse("Invalid credentials, please try again.")
+                messages.error(request, "Invalid credentials, please try again.")
     else:
         form = LoginForm()
     return render(request, 'user_login/login.html', {'form': form})
 
-
 # Logout View
 @login_required
 def admin_logout_view(request):
-    # Clear custom user session data
     request.session.flush()  # Logs out both session and Django user
     return redirect('user_login:login')  # Redirect to login page
 
+# ------------------- USER VIEWS -------------------
 
-# ------------------ USER MANAGEMENT VIEWS ------------------
-
-# Create User View
-# @login_required
 def create_user(request):
     if request.method == 'POST':
         form = UserForm(request.POST)
@@ -78,15 +60,9 @@ def create_user(request):
         form = UserForm()
     return render(request, 'user_login/create_user.html', {'form': form})
 
-
 def view_user(request, user_id):
     user = get_object_or_404(User, user_id=user_id)
     return render(request, 'user_login/view_user.html', {'user': user})
-
-
-
-
-
 
 def user_list(request):
     query = request.GET.get('search', '')  # Get search query if exists
@@ -94,29 +70,21 @@ def user_list(request):
         users = User.objects.filter(name__icontains=query)  # Filter users
     else:
         users = User.objects.all()  # Fetch all users
-
     return render(request, 'user_login/user_list.html', {'users': users, 'query': query})
 
-
-# @login_required
 def update_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
     if request.method == 'POST':
-        print("POST request received")
         form = UserForm(request.POST, instance=user)
-        print("Form data:", request.POST)  # See what data is being sent
         if form.is_valid():
-            print("Form is valid, saving...")
             form.save()
             return redirect('user_list')
         else:
-            print("Form errors:", form.errors)  # See why validation fails
+            messages.error(request, "Error updating user.")
     else:
         form = UserForm(instance=user)
     return render(request, 'user_login/update_user.html', {'form': form, 'user': user})
 
-    
-# Delete User View
 @login_required
 def delete_user(request, user_id):
     user = get_object_or_404(User, pk=user_id)
@@ -129,11 +97,7 @@ def delete_user(request, user_id):
 
 @login_required(login_url='login')
 def dashboard_view(request):
-    total_expenses = Expense.objects.count()
-    total_expense_categories = ExpenseCategory.objects.count()
-    total_expense_reports = ExpenseReport.objects.count()
-
-    users = User.objects.all()  # Fetch all users
+    users = User.objects.all()
     context = {
         'total_users': users.count(),
         'total_bookings': Booking.objects.count(),
@@ -142,34 +106,11 @@ def dashboard_view(request):
         'total_payments': Payment.objects.count(),
         'total_tour_packages': TourPackage.objects.count(),
         'total_tourism_companies': TourismCompany.objects.count(),
-        'users': users,  # Pass users list to template
-        'total_expenses': total_expenses,
-        'total_expense_categories': total_expense_categories,
-        'total_expense_reports': total_expense_reports,
+        'users': users,
     }
-    print("✅ @login_required is being applied!")  # Debugging
     return render(request, 'user_login/dashboard.html', context)
 
-
-
-class ExpenseCategoryListView(ListView):
-    model = ExpenseCategory
-    template_name = 'expense_tracker/expense_category_list.html'
-    context_object_name = 'expense_categories'
-    
-
-
-class ExpenseReportListView(ListView):
-    model = ExpenseReport
-    template_name = 'expense_tracker/expense_report_list.html'
-
-
-#-------------------------For user dashboard
-
-
-#--------------------------FOR USERS TO SIGNUP BEFORE LOGIN 
-
-
+# ------------------- SIGNUP VIEWS -------------------
 
 def signup_view(request):
     if request.method == "POST":
@@ -184,15 +125,9 @@ def signup_view(request):
             messages.error(request, "Please correct the errors below.")
     else:
         form = SignupForm()
-    
     return render(request, 'user_login/user_signup.html', {'form': form})
 
-
-
-
-#-------------------------------FOR USER TO LOGIN AND CHECK 
-#-------------------------------IF THE USER IS LOGGED IN OR NOT 
-
+# ------------------- USER LOGIN/LOGOUT -------------------
 
 def user_login_view(request):
     if request.method == 'POST':
@@ -200,36 +135,23 @@ def user_login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
-
             try:
                 user = User.objects.get(email=email)
-
                 if check_password(password, user.password):  # Verify hashed password
-                    # Store user information in session
                     request.session['user_id'] = user.id
-                    request.session['user_name'] = user.name 
-                    request.session['user_role'] = "User"  # Normal user role
-
-
-                    request.session['is_Guest'] = False    # 
-                    request.session['is_superuser'] = False  # Custom users are not superusers
+                    request.session['user_name'] = user.name
+                    request.session['user_role'] = "User"
+                    request.session['is_Guest'] = False
+                    request.session['is_superuser'] = False
                     return redirect('user_login:user_dashboard')
                 else:
                     messages.error(request, 'Invalid password')
-
             except User.DoesNotExist:
                 messages.error(request, 'User not found')
-
     else:
         form = UserLoginForm()
-
     return render(request, 'user_login/user_login.html', {'form': form})
 
-
-
-
-# def user_logout_view(request):
-# 
 def user_logout_view(request):
     if 'user_id' in request.session:
         del request.session['user_id']
@@ -238,21 +160,11 @@ def user_logout_view(request):
     request.session.modified = True
     return redirect('user_login:user-login')
 
+# ------------------- USER DASHBOARD VIEW -------------------
 
-
-
-
-    
-
-# In user_dashboard_view
-# views.py
-
-
-
-# User Dashboard View
 def user_dashboard_view(request):
     if "user_id" not in request.session:
-        return redirect("user_login:user-login")
+        return redirect("user-login")
     
     user = User.objects.get(id=request.session["user_id"])
     wishlist = Wishlist.objects.filter(user=user)
@@ -262,7 +174,6 @@ def user_dashboard_view(request):
     wishlist_form = WishlistForm()
     trip_form = TripForm()
     profile_form = ProfileUpdateForm(instance=user)
-   
     
     context = {
         "user": user,
@@ -272,12 +183,11 @@ def user_dashboard_view(request):
         "wishlist_form": wishlist_form,
         "trip_form": trip_form,
         "profile_form": profile_form,
-        
     }
     return render(request, "user_login/user_dashboard.html", context)
 
+# ------------------- ADD TO WISHLIST -------------------
 
-# Add to Wishlist (Updated to handle GET and POST)
 def add_to_wishlist(request):
     if "user_id" not in request.session:
         return redirect("user_login:user-login")
@@ -298,9 +208,7 @@ def add_to_wishlist(request):
     
     return render(request, "user_login/add_to_wishlist.html", {"form": form})
 
-
-
-# Add a Trip (Updated to handle GET and POST)
+# ------------------- ADD A TRIP -------------------
 
 def add_trip(request):
     if "user_id" not in request.session:
@@ -312,22 +220,21 @@ def add_trip(request):
         form = TripForm(request.POST)
         if form.is_valid():
             trip = form.save(commit=False)
-            trip.user = user  # ✅ Assign user before saving
+            trip.user = user
             trip.save()
             messages.success(request, "Trip added successfully!")
-            return redirect("user_login:user_details")  # ✅ Redirect to trip list
+            return redirect("user_login:user_details")
         else:
             messages.error(request, "Error adding trip.")
 
     form = TripForm()
     return render(request, "user_login/add_trip.html", {"form": form})
 
+# ------------------- UPDATE PROFILE -------------------
 
-
-# Update Profile (Updated to handle GET and POST)
 def update_profile(request):
     if "user_id" not in request.session:
-        return redirect("user_login/user-login")  # Redirect to login if not logged in
+        return redirect("user_login:user-login")
 
     user = User.objects.get(id=request.session["user_id"])
 
@@ -336,57 +243,32 @@ def update_profile(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Profile updated!")
-            return redirect("user_login:user_details")  
+            return redirect("user_login:user_details")
         else:
             messages.error(request, "Error updating profile.")
 
     form = ProfileUpdateForm(instance=user)
-    return render(request, "user_login/update_profile.html", {"form": form})  
+    return render(request, "user_login/update_profile.html", {"form": form})
 
-
-
-# Optional: Create Notification (for testing)
-def create_notification(request):
-    if request.method == "POST" and "user_id" in request.session:
-        user = User.objects.get(user_id=request.session["user_id"])
-        form = NotificationForm(request.POST)
-        if form.is_valid():
-            notification = form.save(commit=False)
-            notification.user = user
-            notification.save()
-            messages.success(request, "Notification created!")
-    return redirect("user_dashboard")
-
-
-
-
-
-#---------------User details view 
-#-------to show user their details when they click my account from user dashboard
-
+# ------------------- USER DETAILS VIEW -------------------
 
 def user_details_view(request):
     if "user_id" not in request.session:
-        return redirect("user-login")  # Redirect if not logged in
+        return redirect("user-login")
 
-    
-    user = User.objects.get(id=request.session["user_id"])  # Fetch logged-in user
-    wishlist_items = Wishlist.objects.filter(user=user)  #  Get wishlist items for the logged-in user
+    user = User.objects.get(id=request.session["user_id"])
+    wishlist_items = Wishlist.objects.filter(user=user)
     trips = Trip.objects.filter(user=user)
 
-    # Get total followers and following counts
-    followed_count = Follow.objects.filter(follower=user).count() # Users the current user is following
-    followers_count = Follow.objects.filter(followed=user).count() # Users following the current user
+    followed_count = Follow.objects.filter(follower=user).count()
+    followers_count = Follow.objects.filter(followed=user).count()
 
-    # Search for other travelers
     search_query = request.GET.get('search', '')
     if search_query:
-        # Exclude the current user from search results
         search_results = User.objects.filter(name__icontains=search_query).exclude(id=user.id)
     else:
         search_results = []
 
-    # Handle follow/unfollow action
     if request.method == 'POST' and 'follow_user' in request.POST:
         user_to_follow_id = request.POST.get('user_to_follow')
         try:
@@ -402,43 +284,16 @@ def user_details_view(request):
                     messages.success(request, f"You are now following {user_to_follow.name}.")
         except User.DoesNotExist:
             messages.error(request, "User does not exist.")
-        return redirect('user_login:user_details')
+        return redirect('user_details')
     
-
     return render(request, "user_login/user_details.html", {
-    "user": user,
-    "wishlist_items": wishlist_items,
-    "trips": trips,
-    "followed_count": followed_count,
-    "followers_count": followers_count,
-    "search_query": search_query,
-    "search_results": search_results,
-})
+        "user": user,
+        "wishlist_items": wishlist_items,
+        "trips": trips,
+        "followed_count": followed_count,
+        "followers_count": followers_count,
+        "search_query": search_query,
+        "search_results": search_results,
+    })
 
-
-#----------------------------------------------------------------
-# This view is for Users to Book their packages 
-
-
-def user_bookings(request):
-    if request.session.get("user_role") != "User":
-        return redirect("user_dashboard")  # Only users can see their bookings
-
-    user_id = request.session.get("user_id")
-    user = request.user  
-    if not user_id:
-        print("User ID is missing from session!")
-        return redirect("login")
-
-    print("Fetching bookings for User ID:", user_id)
-    
-    bookings = Booking.objects.filter(user_name=user.username)
-
-
-    #bookings = Booking.objects.filter(user=user_id)  # Changed 'user_id' to 'user'
-    print("Bookings Found:", bookings)
-
-    return render(request, "user_login/users_bookings.html", {"bookings": bookings})
-
-#-----------------------------------------------------
 
