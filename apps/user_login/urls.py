@@ -16,7 +16,7 @@ urlpatterns = [
 
     
     # Book a Tour: POST endpoint to book a tour package
-    path("user/bookings/", views.user_bookings, name="user_bookings"),
+    
 
 
     path('users/', views.user_list, name='user_list'),

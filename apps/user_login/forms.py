@@ -1,55 +1,84 @@
 from django import forms
-from .models import User, LoginAdmin
-from django.contrib.auth.hashers import check_password  # For secure password checking
-from django.contrib.auth.hashers import make_password
-from .models import User, Wishlist, Trip, Notification
+from .models import User, LoginAdmin, Wishlist, Trip, Notification
+from django.contrib.auth.hashers import make_password, check_password
+from django.core.exceptions import ValidationError
+import re
+
+# Utility function to check for malicious input
+def validate_input(value):
+    pattern = r"[;'\"--]|(/\*.*\*/)|(<[^>]+>)"
+    if re.search(pattern, value):
+        raise ValidationError("Invalid or potentially harmful characters detected.")
 
 # Admin Login Form
 class LoginForm(forms.ModelForm):
     class Meta:
         model = LoginAdmin
         fields = ['username', 'password']
+        widgets = {
+            'password': forms.PasswordInput(),
+        }
+
+    def clean_username(self):
+        username = self.cleaned_data.get('username')
+        validate_input(username)
+        return username
+
 
 # User Signup Form
-
 class SignupForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['name', 'email', 'password', 'phone', 'address', 'gender', 'status', 'dob']
         widgets = {
-            'dob': forms.DateInput(attrs={'type': 'date'}),  # Ensure correct input type
-            'password': forms.PasswordInput(),  # Hide password input
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'password': forms.PasswordInput(),
         }
-    
+
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in ['name', 'address', 'phone']:
+            value = cleaned_data.get(field)
+            if value:
+                validate_input(value)
+        return cleaned_data
+
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        return make_password(password)  # Hash password before saving
+        if len(password) < 8:
+            raise ValidationError("Password must be at least 8 characters.")
+        return make_password(password)
 
-   
 
 # User Login Form
-class UserLoginForm(forms.Form):  # Use Form, not ModelForm
+class UserLoginForm(forms.Form):
     email = forms.EmailField()
     password = forms.CharField(widget=forms.PasswordInput)
 
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        validate_input(email)
+        return email
 
 
-# Form for Adding to Wishlist
+# Wishlist Form
 class WishlistForm(forms.ModelForm):
     class Meta:
         model = Wishlist
         fields = ['destination_name', 'description']
-        # widgets = {
-        #     'description': forms.Textarea(attrs={'rows': 3}),
-        # }
-        
+
     def __init__(self, *args, **kwargs):
         super(WishlistForm, self).__init__(*args, **kwargs)
         self.fields["destination_name"].required = True
-        self.fields["description"].required = False  # Make it optional
-        
+        self.fields["description"].required = False
 
-# Form for Adding a Trip
+    def clean_destination_name(self):
+        dest = self.cleaned_data.get('destination_name')
+        validate_input(dest)
+        return dest
+
+
+# Trip Form
 class TripForm(forms.ModelForm):
     class Meta:
         model = Trip
@@ -59,17 +88,33 @@ class TripForm(forms.ModelForm):
             'end_date': forms.DateInput(attrs={'type': 'date'}),
         }
 
-# Form for Updating Profile Customization
+    def clean_destination(self):
+        destination = self.cleaned_data.get('destination')
+        validate_input(destination)
+        return destination
+
+
+# Profile Update Form
 class ProfileUpdateForm(forms.ModelForm):
     class Meta:
         model = User
-        fields = ['name', 'phone', 'address', 'bio', 'theme']  # Add fields you want users to edit
+        fields = ['name', 'phone', 'address', 'bio', 'theme']
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 3}),
             'theme': forms.Select(choices=[('light', 'Light'), ('dark', 'Dark')]),
         }
+    
 
-# Optional: Form for Manual Notification Creation 
+    def clean(self):
+        cleaned_data = super().clean()
+        for field in ['name', 'address', 'phone', 'bio']:
+            value = cleaned_data.get(field)
+            if value:
+                validate_input(value)
+        return cleaned_data
+
+
+# Notification Form
 class NotificationForm(forms.ModelForm):
     class Meta:
         model = Notification
@@ -79,9 +124,13 @@ class NotificationForm(forms.ModelForm):
             'notification_type': forms.Select(choices=[('deal', 'Deal'), ('flight', 'Flight Change'), ('safety', 'Safety Update')]),
         }
 
+    def clean_message(self):
+        msg = self.cleaned_data.get('message')
+        validate_input(msg)
+        return msg
 
 
-# User Registration Form
+# User Registration Form (if used separately)
 class UserForm(forms.ModelForm):
     class Meta:
         model = User
@@ -93,4 +142,6 @@ class UserForm(forms.ModelForm):
 
     def clean_password(self):
         password = self.cleaned_data.get('password')
-        return password  # Ideally, hash the password before saving
+        if len(password) < 8:
+            raise ValidationError("Password must be at least 8 characters.")
+        return make_password(password)

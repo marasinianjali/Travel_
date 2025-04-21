@@ -22,6 +22,21 @@ from apps.social_community.forms import FollowUserForm
 from apps.social_community.models import Post
 from django.views.generic import ListView
 
+import logging
+from django.utils.timezone import now
+from axes.helpers import get_lockout_response
+# for user login to check supsicious login attempts
+logger = logging.getLogger(__name__)
+
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for:
+        ip = x_forwarded_for.split(',')[0]
+    else:
+        ip = request.META.get('REMOTE_ADDR')
+    return ip
+
+
 # ------------------ AUTHENTICATION VIEWS ------------------
 
 # Login View
@@ -117,10 +132,10 @@ def signup_view(request):
         form = SignupForm(request.POST)
         if form.is_valid():
             user = form.save(commit=False)
-            user.password = form.cleaned_data['password']  # Already hashed in form
+            user.set_password(form.cleaned_data['password'])  # Use secure hash
             user.save()
             messages.success(request, "Account created successfully!")
-            return redirect('user-login')  # Redirect to login after signup
+            return redirect('user-login')
         else:
             messages.error(request, "Please correct the errors below.")
     else:
@@ -135,6 +150,8 @@ def user_login_view(request):
         if form.is_valid():
             email = form.cleaned_data['email']
             password = form.cleaned_data['password']
+            ip = get_client_ip(request)
+
             try:
                 user = User.objects.get(email=email)
                 if check_password(password, user.password):  # Verify hashed password
@@ -145,12 +162,21 @@ def user_login_view(request):
                     request.session['is_superuser'] = False
                     return redirect('user_login:user_dashboard')
                 else:
+                    logger.warning(f"[{now()}] Invalid password attempt for {email} from IP {ip}")
                     messages.error(request, 'Invalid password')
             except User.DoesNotExist:
+                logger.warning(f"[{now()}] Login attempt for non-existent user {email} from IP {ip}")
                 messages.error(request, 'User not found')
     else:
         form = UserLoginForm()
+    
     return render(request, 'user_login/user_login.html', {'form': form})
+
+
+# FOR TOO MANY LOGIN ATTEMPTS 
+
+def account_locked_view(request):
+    return render(request, 'user_login/account_locked.html')
 
 def user_logout_view(request):
     if 'user_id' in request.session:

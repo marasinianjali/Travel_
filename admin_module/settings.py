@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'apps.expense_tracker',
     'apps.maps',
     'apps.social_stories',
+    'axes','axes',
     
 ]   
 
@@ -71,6 +72,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'axes.middleware.AxesMiddleware',
 ]
 
 ROOT_URLCONF = 'admin_module.urls'
@@ -153,3 +155,28 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #CUSTOM USER MODEL
+
+# For login (user login for security such as )
+# log suspicious login activity and limit brute-force login attempts 
+
+AXES_FAILURE_LIMIT = 5  # Max failed attempts
+AXES_COOLOFF_TIME = 1  # Lockout period (in hours)
+AXES_LOCKOUT_TEMPLATE = 'user_login/lockout.html'  # Optional custom template
+AXES_ONLY_USER_FAILURES = True  # Lock per username
+AXES_USERNAME_FORM_FIELD = 'email'  # Since you're logging in using email
+
+
+AUTHENTICATION_BACKENDS = [
+    'axes.backends.AxesModelBackend',  # Axes handles brute-force protection
+    'django.contrib.auth.backends.ModelBackend',  # Default Django auth
+]
+
+# Add these security settings
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = True  # If using HTTPS
+SESSION_COOKIE_SECURE = True  # If using HTTPS
+
+# For too many login attempts
+AXES_LOCKOUT_TEMPLATE = 'user_login/account_locked.html'

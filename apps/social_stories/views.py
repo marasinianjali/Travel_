@@ -128,6 +128,42 @@ def like_article(request, article_id):
     return redirect('social_stories:article_detail', article_id=article_id)
 
 
+# Add comment to post
+@login_required
+def add_comment_to_post(request, post_id):
+    if not check_login(request):
+        messages.error(request, "Please log in to comment.")
+        return redirect('user-login')
+    
+    post = get_object_or_404(post, id=post_id)
+    user = User.objects.get(id=request.session['user_id'])
+    content = request.POST.get('content')
+
+    if content:
+        Comment.objects.create(user=user, post=post, content=content)
+        messages.success(request, "Your comment has been added!")
+
+    return redirect('social_stories:post_detail', post_id=post_id)
+
+# Add comment to article
+@login_required
+def add_comment_to_article(request, article_id):
+    if not check_login(request):
+        messages.error(request, "Please log in to comment.")
+        return redirect('user-login')
+    
+    article = get_object_or_404(Article, id=article_id)
+    user = User.objects.get(id=request.session['user_id'])
+    content = request.POST.get('content')
+
+    if content:
+        Comment.objects.create(user=user, article=article, content=content)
+        messages.success(request, "Your comment has beed added!")
+
+    return redirect('social_stories:article_detail', article_id=article_id)
+
+
+
 # Edit comment
 @login_required
 def edit_comment(request, comment_id):

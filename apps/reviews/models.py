@@ -1,61 +1,109 @@
 from django.db import models
+from django.contrib.auth.models import User
+from apps.tourism_company.models import TourismCompany
+from apps.tour_package.models import TourPackage
+from apps.Guides.models import Guide
+from apps.hotelbooking.models import HotelBooking
+from django.core.validators import FileExtensionValidator
 
+class Review(models.Model):
+    review_id = models.AutoField(primary_key=True)
 
-class TourismCompany(models.Model):
-    company_id = models.AutoField(primary_key=True)
-
-    # User Details
-    user_name = models.CharField(
-        max_length=100,
-        verbose_name="User Name",
-        help_text="Name of the person managing the company account."
-    )
-    user_phone = models.CharField(
-        max_length=20,
-        verbose_name="User Phone",
-        help_text="Contact number of the user."
-    )
-    user_email = models.EmailField(
-        max_length=55,
-        unique=True,
-        verbose_name="User Email",
-        help_text="Email address of the user (used for login)."
+    # User who created the review
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews',
+        verbose_name="Reviewer",
+        help_text="User who submitted the review."
     )
 
-    # Company Details
-    company_name = models.CharField(
-        max_length=255,
-        unique=True,
-        verbose_name="Company Name",
-        help_text="Unique name of the tourism company."
+    # Related entities (all optional)
+    package = models.ForeignKey(
+        TourPackage,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviews',
+        verbose_name="Tour Package",
+        help_text="Tour package being reviewed, if applicable."
     )
-    company_phone = models.CharField(
-        max_length=20,
-        verbose_name="Company Phone",
-        help_text="Phone number of the tourism company."
+    guide = models.ForeignKey(
+        Guide,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviews',
+        verbose_name="Guide",
+        help_text="Guide being reviewed, if applicable."
     )
-    company_address = models.CharField(
-        max_length=255,
-        verbose_name="Company Address",
-        help_text="Physical address of the tourism company."
+    hotel = models.ForeignKey(
+        HotelBooking,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviews',
+        verbose_name="Hotel Booking",
+        help_text="Hotel booking being reviewed, if applicable."
+    )
+    company = models.ForeignKey(
+        TourismCompany,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='reviews',
+        verbose_name="Tourism Company",
+        help_text="Tourism company being reviewed, if applicable."
     )
 
-    # Authentication & Status
-    password = models.CharField(
-        max_length=128,
-        verbose_name="Password",
-        help_text="Password for the company account."
+    # Review details
+    rating = models.IntegerField(
+        choices=[(i, i) for i in range(1, 6)],
+        verbose_name="Rating",
+        help_text="Rating from 1 to 5 stars."
     )
-    is_active = models.BooleanField(
-        default=True,
-        verbose_name="Is Active",
-        help_text="Indicates whether the account is active."
+    review_text = models.TextField(
+        blank=True,
+        null=True,
+        verbose_name="Review Text",
+        help_text="Detailed review comments."
+    )
+    photo = models.ImageField(
+        upload_to='reviews/',
+        blank=True,
+        null=True,
+        verbose_name="Photo",
+        help_text="Optional photo uploaded with the review (JPG/PNG only, max 5MB).",
+        validators=[
+            FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png'])
+        ]
+    )
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+        verbose_name="Created At",
+        help_text="Date and time when the review was created."
+    )
+    updated_at = models.DateTimeField(
+        auto_now=True,
+        verbose_name="Updated At",
+        help_text="Date and time when the review was last updated."
     )
 
     def __str__(self):
-        return self.company_name
+        return f"Review by {self.user.username} - {self.rating} stars"
 
     class Meta:
-        db_table = 'TourismCompany'
-        verbose_name = "Tourism Company"
-        verbose_name_plural = "Tourism Companies"
+        db_table = 'Reviews'
+        verbose_name = "Review"
+        verbose_name_plural = "Reviews"
+        indexes = [
+            models.Index(fields=['user']),
+            models.Index(fields=['company']),
+            models.Index(fields=['created_at']),
+        ]
+        constraints = [
+            models.CheckConstraint(
+                check=models.Q(rating__gte=1) & models.Q(rating__lte=5),
+                name='valid_rating_range'
+            ),
+        ]

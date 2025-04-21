@@ -37,8 +37,10 @@ def guide_view(request, slug):
     return render(request, 'guides/guide_view.html', {'guide': guide})
 
 
-# Detail view by primary key
-def guide_detail(request, pk):
+# Detail view for to update/edit or delete a guide   
+# This view is not accessible to regular users
+@login_required 
+def guide_edit_delete(request, pk):
     guide = get_object_or_404(Guide, pk=pk)
     return render(request, 'guides/guide_detail.html', {'guide': guide})
 

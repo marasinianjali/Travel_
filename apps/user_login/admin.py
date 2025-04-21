@@ -4,11 +4,11 @@ from .models import User, LoginAdmin, Wishlist, Trip, Notification, Booking, Lan
 
 # Custom admin configuration for the User model
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'email', 'phone', 'status', 'dob', 'gender', 'theme', 'created_at', 'updated_at')
+    list_display = ('id', 'name', 'email', 'phone', 'status', 'dob', 'gender', 'theme')
     search_fields = ('name', 'email', 'phone')
     list_filter = ('status', 'gender', 'theme')
-    ordering = ('-created_at',)
-    readonly_fields = ('created_at', 'updated_at')
+   
+  
 
 admin.site.register(User, UserAdmin)
 

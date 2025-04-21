@@ -18,6 +18,7 @@ class Follow(models.Model):
         db_table = 'follows'  # Tell Django to use the existing 'follows' table
 
 
+
 class DiscussionGroup(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True, null=True)
@@ -65,7 +66,7 @@ class Post(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        ordering = ['-created_at'] #Newest posts first
+        ordering = ['-created_at'] #Newest posts first 
         db_table = 'group_posts'
 
     def __str__(self):

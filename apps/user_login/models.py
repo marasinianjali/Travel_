@@ -3,7 +3,7 @@ from django.db import models
 from django.contrib.auth.hashers import make_password
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from apps.tour_package.models import tour_package  # Importing TourPackage model
+from apps.tour_package.models import TourPackage  # Importing TourPackage model
 
 
 # Abstract Base Class for common fields

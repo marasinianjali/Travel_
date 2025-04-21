@@ -18,10 +18,16 @@ def booking_list(request):
     return render(request, 'bookings/booking_list.html', {'bookings': bookings})
 
 
-
+from django.contrib.auth import get_user_model
+User = get_user_model()
 def create_booking(request):
     if "user_id" not in request.session:
         return redirect("user_login:user-login")
+    
+    user_id = request.session.get("user_id")
+    user = User.objects.get(id=user_id)
+
+
     if request.method == 'POST':
         form = BookingForm(request.POST)
         if form.is_valid():

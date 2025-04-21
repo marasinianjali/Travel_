@@ -1,8 +1,9 @@
-
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from django.utils.html import strip_tags
+import bleach
 
 class Location(models.Model):
     name = models.CharField(
@@ -60,14 +61,19 @@ class Location(models.Model):
         return f"https://maps.geoapify.com/v1/staticmap?style=osm-bright&width=600&height=400&center=lonlat:{self.longitude},{self.latitude}&zoom=12&apiKey={api_key}"
 
     def clean(self):
-        """Model-level validation."""
+        """Model-level validation & sanitization (against XSS)."""
         if not self.name:
             raise ValidationError("Location name is required.")
         if not (self.latitude and self.longitude):
             raise ValidationError("Latitude and Longitude are required.")
 
+        # XSS protection for 'name' field
+        clean_name = bleach.clean(self.name, tags=[], attributes={}, strip=True)
+        self.name = strip_tags(clean_name)
+
     def save(self, *args, **kwargs):
-        """Override save to auto-generate slug."""
+        """Override save to sanitize input and auto-generate slug."""
+        self.full_clean()  # Calls clean() to sanitize input
         if not self.slug:
             self.slug = slugify(self.name)
         super().save(*args, **kwargs)
@@ -83,3 +89,12 @@ class Language(models.Model):
 
     def __str__(self):
         return self.name
+
+    def clean(self):
+        """Sanitize name to prevent XSS."""
+        clean_name = bleach.clean(self.name, tags=[], attributes={}, strip=True)
+        self.name = strip_tags(clean_name)
+
+    def save(self, *args, **kwargs):
+        self.full_clean()  # Sanitizes input
+        super().save(*args, **kwargs)

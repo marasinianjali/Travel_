@@ -12,6 +12,7 @@ def add_location(request):
     if request.method == "POST":
         form = LocationForm(request.POST)
         if form.is_valid():
+
             form.save()
             return redirect('location_list')  # Redirect to the location list page
     else:

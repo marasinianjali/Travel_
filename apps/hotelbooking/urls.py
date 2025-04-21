@@ -30,9 +30,9 @@ urlpatterns = [
     path('hotel/<int:hotel_id>/add_room_availability/', views.add_room_availability, name='add_room_availability'),
     path('availability/edit/<int:pk>/', views.edit_availability, name='edit_availability'),
     path('availability/delete/<int:pk>/', views.delete_availability, name='delete_availability'),
-    path('amenity-list/', views.amenity_list, name='amenity_list'),
+    
     path('room-availability-list/', views.room_availability_list, name='room_availability_list'),
-    path('hotel/<int:hotel_id>/amenities/', views.view_hotel_amenity, name='view_hotel_amenity'),
+   
     path('hotel/<int:hotel_id>/room_availability/', views.view_room_availability, name='view_room_availability'),
     path('reports/', views.hotel_report_list, name='hotel_report_list'),
     path('reports/add/', views.hotel_report_create, name='hotel_report_create'),

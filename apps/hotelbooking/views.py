@@ -6,6 +6,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.db.models import Sum, Q
 from django.contrib.auth import authenticate, login, logout
 from django.contrib import messages
+from .models import RoomAvailability
 
 #-----------------------------------------------------
 # Helper Function for Role-based Access Control
@@ -216,3 +217,98 @@ def delete_availability(request, pk):
     availability.delete()
     return redirect('hotel_dashboard')
 
+
+
+
+#------------------------------------------------------
+def hotel_revenue_list(request):
+    query = request.GET.get('q', '')  # Get search query from the request
+
+    # Retrieve all HotelRevenue records, no filtering by user since user is not a field
+    revenues = HotelRevenue.objects.all()
+
+    # If a query is present, filter by hotel name or status
+    if query:
+        revenues = revenues.filter(
+            Q(hotel_name__icontains=query) | Q(status__icontains=query)
+        )
+
+    # Calculate total revenue
+    total_revenue = revenues.aggregate(total_revenue=Sum('amount'))['total_revenue'] or 0
+
+    # Enhance each object dynamically (peak season and average value if needed)
+    
+    # Ensure the render statement is always returned
+    return render(request, 'hotel_booking/hotel_revenue_list.html', {
+        'revenues': revenues,
+        'total_revenue': total_revenue,
+        'query': query,
+    })
+
+def view_hotel_revenue(request, revenue_id):
+    revenue = get_object_or_404(HotelRevenue, id=revenue_id)
+    return render(request, 'hotel_booking/view_hotel_revenue.html', {'revenue': revenue})
+
+
+def room_availability_list(request):
+    availability_list = RoomAvailability.objects.select_related('room__hotel').all()
+    hotel_id = None
+
+    if availability_list:
+        first_availability = availability_list.first()
+        if first_availability.room and first_availability.room.hotel:
+            hotel_id = first_availability.room.hotel.hotel_id
+
+    return render(request, 'hotel_booking/room_availability_list.html', {
+        'availability_list': availability_list,
+        'hotel_id': hotel_id,
+    })
+
+
+def view_room_availability(request, hotel_id):
+    hotel = get_object_or_404(HotelBooking, pk=hotel_id)
+    rooms = hotel.rooms.all()
+    room_availabilities = RoomAvailability.objects.filter(room__in=rooms)
+    return render(request, 'hotel_booking/view_room_availability.html', {
+        'hotel': hotel,
+        'room_availabilities': room_availabilities,
+    })
+def hotel_report_list(request):
+    reports = HotelReport.objects.all()
+    return render(request, 'hotel_booking/report_list.html', {'reports': reports})
+
+# Create Report
+def hotel_report_create(request):
+    if request.method == 'POST':
+        form = HotelReportForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Hotel report created successfully.")
+            return redirect('hotel_report_list')
+    else:
+        form = HotelReportForm()
+    return render(request, 'hotel_booking/report_form.html', {'form': form, 'title': 'Create Hotel Report'})
+
+
+# Update Report
+def hotel_report_update(request, pk):
+    report = get_object_or_404(HotelReport, pk=pk)
+    if request.method == 'POST':
+        form = HotelReportForm(request.POST, instance=report)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Hotel report updated successfully.")
+            return redirect('hotel_report_list')
+    else:
+        form = HotelReportForm(instance=report)
+    return render(request, 'hotel_booking/report_form.html', {'form': form, 'title': 'Update Hotel Report'})
+
+
+# Delete Report
+def hotel_report_delete(request, pk):
+    report = get_object_or_404(HotelReport, pk=pk)
+    if request.method == 'POST':
+        report.delete()
+        messages.success(request, "Hotel report deleted successfully.")
+        return redirect('hotel_report_list')
+    return render(request, 'hotel_booking/report_confirm_delete.html', {'report': report})

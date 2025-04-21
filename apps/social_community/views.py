@@ -3,6 +3,8 @@ from apps.user_login.models import User
 from .models import Follow, Post
 from django.contrib import messages
 from .forms import PostForm
+from django.db.models import Q
+from django.utils.html import escape
 from apps.social_community.models import Category
 Category.objects.all()  
 
@@ -11,17 +13,22 @@ def check_login(request):
         return False
     return True
 
+
+
 def followed_list(request):
     if not check_login(request):
         return redirect("user-login")
 
     user = User.objects.get(id=request.session["user_id"])
-    search_query = request.GET.get('search', '')
+    search_query = request.GET.get('search', '').strip()
+
     followed = Follow.objects.filter(follower=user).select_related('followed')
 
     if search_query:
-        followed = followed.filter(followed__name__icontains=search_query)
-    
+        # Sanitize the input and use Q objects to prevent injection-like behavior
+        safe_query = escape(search_query)
+        followed = followed.filter(Q(followed__name__icontains=safe_query))
+
     return render(request, 'social_community/following_list.html', {
         'followed': followed,
         'search_query': search_query,
