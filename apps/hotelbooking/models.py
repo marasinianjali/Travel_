@@ -1,4 +1,7 @@
 from django.db import models
+from fernet_fields import EncryptedCharField
+
+
 from django.contrib.auth.models import User
 from apps.maps.models import Location
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -6,7 +9,26 @@ from django.core.exceptions import ValidationError
 from django.utils.text import slugify
 from django.utils import timezone
 from datetime import date
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField,  EncryptedEmailField
 
+
+from fernet_fields import EncryptedField
+from django.db import models
+from decimal import Decimal
+
+class EncryptedDecimalField(EncryptedField, models.TextField):
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return str(Decimal(value))  # Convert to string for encryption
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return Decimal(value)
+        except:
+            return Decimal('0.00')
 
 # Language model for normalization
 class Language(models.Model):
@@ -72,18 +94,21 @@ class HotelBooking(models.Model):
     hotel_id = models.AutoField(primary_key=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="User")
     hotel_name = models.CharField(max_length=255, verbose_name="Hotel Name")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], verbose_name="Base Amount")
+    amount = EncryptedDecimalField(default=1000.00, 
+                                   validators=[MinValueValidator(0.01)], 
+                                   verbose_name="Base Amount")
     photo = models.ImageField(upload_to="hotel_photos/", null=True, blank=True, verbose_name="Hotel Photo")
     hotel_address = models.CharField(max_length=255, verbose_name="Hotel Address")
-    contact_number = models.CharField(max_length=20, verbose_name="Contact Number")
+    contact_number = EncryptedCharField(max_length=20, verbose_name="Contact Number")
     total_person = models.PositiveIntegerField(validators=[MinValueValidator(1)], verbose_name="Total Persons")
     arrive_time = models.DateTimeField(verbose_name="Arrival Time")
     checkout_time = models.DateTimeField(default=default_checkout_time, verbose_name="Checkout Time")
-    total_price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name="Total Price")
+    total_price = EncryptedDecimalField(default=1000.00,  
+                                        verbose_name="Total Price")
     location = models.ForeignKey(Location, on_delete=models.SET_NULL, null=True, verbose_name="Location")
     latitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Latitude")
     longitude = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True, verbose_name="Longitude")
-    email = models.EmailField(verbose_name="Email Address")
+    email = EncryptedEmailField(verbose_name="Email Address")
     room_type = models.CharField(max_length=100, choices=ROOM_TYPE_CHOICES, verbose_name="Room Type")
     rooms_available = models.BooleanField(default=True, verbose_name="Rooms Available")
     notify_admin = models.BooleanField(default=False, verbose_name="Notify Admin")
@@ -142,7 +167,9 @@ class RoomAvailability(models.Model):
 
 class HotelRevenue(models.Model):
     hotel_name = models.CharField(max_length=255, verbose_name="Hotel Name")
-    amount = models.DecimalField(max_digits=10, decimal_places=2, validators=[MinValueValidator(0.01)], verbose_name="Amount")
+    amount = EncryptedDecimalField(default=1000.00, 
+                                    validators=[MinValueValidator(0.01)], 
+                                    verbose_name="Amount")
     status = models.CharField(max_length=50, verbose_name="Payment Status")
 
     def __str__(self):

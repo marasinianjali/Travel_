@@ -1,5 +1,5 @@
 from django.db import models
-
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField, EncryptedEmailField
 
 class TourPackage(models.Model):
     package_id = models.AutoField(
@@ -7,7 +7,7 @@ class TourPackage(models.Model):
         verbose_name="Package ID",
         help_text="Unique identifier for the tour package."
     )
-    package_name = models.CharField(
+    package_name = EncryptedCharField(
         max_length=255,
         verbose_name="Package Name",
         help_text="Name of the tour package."
@@ -22,7 +22,7 @@ class TourPackage(models.Model):
         verbose_name="Date",
         help_text="Date the tour package is scheduled for."
     )
-    description = models.TextField(
+    description = EncryptedTextField(
         verbose_name="Description",
         help_text="Detailed description of the tour package."
     )
@@ -36,22 +36,22 @@ class TourPackage(models.Model):
         verbose_name="Duration (Days)",
         help_text="Duration of the tour package in days."
     )
-    country = models.CharField(
+    country = EncryptedCharField(
         max_length=255,
         verbose_name="Country",
         help_text="Country where the tour takes place."
     )
-    city = models.CharField(
+    city = EncryptedCharField(
         max_length=255,
         verbose_name="City",
         help_text="City where the tour takes place."
     )
-    tour_type = models.CharField(
+    tour_type = EncryptedCharField(
         max_length=255,
         verbose_name="Tour Type",
         help_text="Type of tour (e.g., Adventure, Family, Cultural)."
     )
-    created_at = models.DateTimeField(
+    created_at = EncryptedDateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the tour package was created."
@@ -64,3 +64,17 @@ class TourPackage(models.Model):
         verbose_name = "Tour Package"
         verbose_name_plural = "Tour Packages"
         db_table = "tour_packages"
+
+
+# For tourism_company 
+class TourismCompany(models.Model):
+    name = EncryptedCharField(max_length=100)  # Encrypted field for name
+    address = EncryptedTextField()  # Encrypted field for address
+    contact_number = EncryptedCharField(max_length=15)  # Encrypted field for contact number
+    email = EncryptedEmailField()  # Encrypted email field
+    website = EncryptedCharField(max_length=200)  # Encrypted field for website
+    created_at = EncryptedDateTimeField(auto_now_add=True)  # Encrypted field for created_at
+    updated_at = EncryptedDateTimeField(auto_now=True)  # Encrypted field for updated_at
+
+    def __str__(self):
+        return self.name

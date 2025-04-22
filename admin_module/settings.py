@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from pathlib import Path
 from decouple import config
 
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 MEDIA_URL = '/media/'
@@ -60,7 +61,7 @@ INSTALLED_APPS = [
     'apps.expense_tracker',
     'apps.maps',
     'apps.social_stories',
-    'axes','axes',
+    'axes',
     
 ]   
 
@@ -162,13 +163,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AXES_FAILURE_LIMIT = 5  # Max failed attempts
 AXES_COOLOFF_TIME = 1  # Lockout period (in hours)
 AXES_LOCKOUT_TEMPLATE = 'user_login/lockout.html'  # Optional custom template
-AXES_ONLY_USER_FAILURES = True  # Lock per username
+  # Lock per username
 AXES_USERNAME_FORM_FIELD = 'email'  # Since you're logging in using email
 
 
 AUTHENTICATION_BACKENDS = [
-    'axes.backends.AxesModelBackend',  # Axes handles brute-force protection
-    'django.contrib.auth.backends.ModelBackend',  # Default Django auth
+     # Axes handles brute-force protection
+    'django.contrib.auth.backends.ModelBackend',
+    'axes.backends.AxesStandaloneBackend',  # Default Django auth
 ]
 
 # Add these security settings
@@ -180,3 +182,7 @@ SESSION_COOKIE_SECURE = True  # If using HTTPS
 
 # For too many login attempts
 AXES_LOCKOUT_TEMPLATE = 'user_login/account_locked.html'
+
+
+# For decimalencryption 
+FIELD_ENCRYPTION_KEYS = [b'7\xb9[d,q\xf9?\xb7D\x94\x13\xc9\xcbQ \x18\xce\xf8\x05\x03\x14\xb66,\x81\x82\xfaM\xff~\x04']

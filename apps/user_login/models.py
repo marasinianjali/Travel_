@@ -4,7 +4,8 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 from apps.tour_package.models import TourPackage  # Importing TourPackage model
-
+from django.utils.text import slugify
+from fernet_fields import EncryptedCharField, EncryptedTextField
 
 # Abstract Base Class for common fields
 class BaseModel(models.Model):
@@ -18,7 +19,7 @@ class BaseModel(models.Model):
 class LoginAdmin(models.Model):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
-    password = models.CharField(max_length=100)
+    password = EncryptedCharField(max_length=100)
     role = models.CharField(max_length=100)
 
     def __str__(self):
@@ -37,7 +38,7 @@ class User(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False, verbose_name="User Name", help_text="Enter the user's full name.")
     email = models.EmailField(max_length=55, unique=True, null=False, verbose_name="Email Address", help_text="Enter a valid email address.")
-    password = models.CharField(max_length=255, null=False, verbose_name="Password", help_text="Password will be hashed before saving.")
+    password = EncryptedCharField(max_length=255, null=False, verbose_name="Password", help_text="Password will be hashed before saving.")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Phone Number", help_text="Enter a phone number.")
     address = models.CharField(max_length=255, blank=True, null=True, verbose_name="Address", help_text="Enter user's address.")
     gender = models.CharField(max_length=20, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], blank=True, null=True, verbose_name="Gender")
@@ -61,7 +62,7 @@ class User(models.Model):
 class Wishlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     destination_name = models.CharField(max_length=100, verbose_name="Destination Name", help_text="Enter the destination name.")
-    description = models.TextField(blank=True, null=True, verbose_name="Description", help_text="Enter a description of the destination.")
+    description = EncryptedTextField(blank=True, null=True, verbose_name="Description", help_text="Enter a description of the destination.")
     added_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -87,7 +88,7 @@ class Trip(models.Model):
 
 class Notification(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    message = models.TextField(verbose_name="Notification Message", help_text="Enter the notification message.")
+    message = EncryptedTextField(verbose_name="Notification Message", help_text="Enter the notification message.")
     notification_type = models.CharField(max_length=50, choices=[('deal', 'Deal'), ('flight', 'Flight Change'), ('safety', 'Safety Update')], verbose_name="Notification Type")
     created_at = models.DateTimeField(auto_now_add=True)
     is_read = models.BooleanField(default=False)

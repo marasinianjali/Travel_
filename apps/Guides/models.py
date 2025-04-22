@@ -2,23 +2,43 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 from django.core.exceptions import ValidationError
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField, EncryptedEmailField
 from django.utils.text import slugify
+
+
+from fernet_fields import EncryptedField
+from django.db import models
+from decimal import Decimal
+
+class EncryptedDecimalField(EncryptedField, models.TextField):
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return str(Decimal(value))  # Convert to string for encryption
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return Decimal(value)
+        except:
+            return Decimal('0.00')
+
 # Abstract base model for common fields
 
 class BasePerson(models.Model):
-    name = models.CharField(
+    name = EncryptedCharField(
         max_length=100,
-        unique=True,
+       
         verbose_name="Full Name",
         help_text="Enter the full name."
     )
-    email = models.EmailField(
-        unique=True,
+    email = EncryptedEmailField(
         max_length=100,
         verbose_name="Email Address",
         help_text="Enter a valid and unique email."
     )
-    phone = models.CharField(
+    phone = EncryptedCharField(
         max_length=20,
         verbose_name="Phone Number",
         help_text="Enter a valid contact number.",
@@ -78,7 +98,7 @@ class Guide(BasePerson):
         verbose_name="Gender",
         help_text="Select the guide's gender."
     )
-    about_us = models.CharField(
+    about_us = EncryptedCharField(
         max_length=200,
         verbose_name="About the Guide",
         help_text="Brief summary about the guide."
@@ -100,13 +120,12 @@ class Guide(BasePerson):
         verbose_name="Years of Experience",
         help_text="Number of years the guide has been active (0–60)."
     )
-    expertise = models.TextField(
+    expertise = EncryptedTextField(
         verbose_name="Areas of Expertise",
         help_text="Enter the guide's key strengths, regions, or specialties."
     )
-    amount = models.DecimalField(
-        max_digits=10,
-        decimal_places=2,
+    amount = EncryptedDecimalField(
+        
         default=1000.00,  
         validators=[MinValueValidator(0.01)],
         verbose_name="Payment Rate",

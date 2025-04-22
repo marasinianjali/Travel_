@@ -5,6 +5,7 @@ from apps.tour_package.models import TourPackage
 from apps.Guides.models import Guide
 from apps.hotelbooking.models import HotelBooking
 from django.core.validators import FileExtensionValidator
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
 
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)
@@ -62,7 +63,7 @@ class Review(models.Model):
         verbose_name="Rating",
         help_text="Rating from 1 to 5 stars."
     )
-    review_text = models.TextField(
+    review_text = EncryptedTextField(
         blank=True,
         null=True,
         verbose_name="Review Text",
@@ -88,6 +89,7 @@ class Review(models.Model):
         verbose_name="Updated At",
         help_text="Date and time when the review was last updated."
     )
+
 
     def __str__(self):
         return f"Review by {self.user.username} - {self.rating} stars"

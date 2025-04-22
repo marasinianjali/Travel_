@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from apps.hotelbooking.models import HotelBooking
 from apps.tour_package.models import TourPackage
 from apps.Guides.models import Guide
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
 
 class Booking(models.Model):
     STATUS_CHOICES = [
@@ -30,12 +31,12 @@ class Booking(models.Model):
         verbose_name="Hotel",
         help_text="Associated hotel booking, if any."
     )
-    user_name = models.CharField(
+    user_name = EncryptedCharField(
         max_length=255,
         verbose_name="User Name",
         help_text="Name of the user who booked the package."
     )
-    phone_number = models.CharField(
+    phone_number = EncryptedCharField(
         max_length=20,
         verbose_name="Phone Number",
         help_text="Phone number of the user."
@@ -62,7 +63,7 @@ class Booking(models.Model):
         verbose_name="Booking Date",
         help_text="Date when the booking was made."
     )
-    booking_details = models.CharField(
+    booking_details = EncryptedCharField(
         max_length=255,
         blank=True,
         null=True,
@@ -83,7 +84,7 @@ class Booking(models.Model):
         verbose_name="Promo Code",
         help_text="Applied promo code for discount, if any."
     )
-    pickup_location = models.CharField(
+    pickup_location = EncryptedCharField(
         max_length=255,
         verbose_name="Pickup Location",
         help_text="Location where the customer will be picked up."

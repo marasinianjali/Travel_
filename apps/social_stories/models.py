@@ -1,6 +1,8 @@
 from django.db import models
 from apps.user_login.models import User
 from apps.social_community.models import Category, Post
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
+
 
 
 class Article(models.Model):
@@ -11,12 +13,12 @@ class Article(models.Model):
         verbose_name="Author",
         help_text="User who wrote the article."
     )
-    title = models.CharField(
+    title = EncryptedCharField(
         max_length=200,
         verbose_name="Title",
         help_text="Title of the article."
     )
-    content = models.TextField(
+    content = EncryptedTextField(
         verbose_name="Content",
         help_text="Main content of the article."
     )
@@ -36,12 +38,12 @@ class Article(models.Model):
         verbose_name="Category",
         help_text="Category of the article."
     )
-    created_at = models.DateTimeField(
+    created_at = EncryptedDateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the article was created."
     )
-    updated_at = models.DateTimeField(
+    updated_at = EncryptedDateTimeField(
         auto_now=True,
         verbose_name="Updated At",
         help_text="Timestamp when the article was last updated."
@@ -58,12 +60,12 @@ class Article(models.Model):
 
 
 class TravelNews(models.Model):
-    title = models.CharField(
+    title = EncryptedCharField(
         max_length=200,
         verbose_name="Title",
         help_text="Title of the travel news."
     )
-    content = models.TextField(
+    content = EncryptedTextField(
         verbose_name="Content",
         help_text="Content of the travel news."
     )
@@ -73,7 +75,7 @@ class TravelNews(models.Model):
         verbose_name="Source URL",
         help_text="Optional source link of the news."
     )
-    created_at = models.DateTimeField(
+    created_at = EncryptedDateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the news was published."
@@ -122,11 +124,11 @@ class Comment(models.Model):
         verbose_name="Comment Image",
         help_text="Optional image for the comment."
     )
-    content = models.TextField(
+    content = EncryptedTextField(
         verbose_name="Content",
         help_text="Content of the comment."
     )
-    created_at = models.DateTimeField(
+    created_at = EncryptedDateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the comment was made."
@@ -168,7 +170,7 @@ class Like(models.Model):
         verbose_name="Article",
         help_text="Article that was liked."
     )
-    created_at = models.DateTimeField(
+    created_at = EncryptedDateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the like was made."

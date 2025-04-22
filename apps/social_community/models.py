@@ -1,11 +1,12 @@
 from django.db import models
 from django.contrib.auth.models import User
 from apps.user_login.models import User
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
 
 class Follow(models.Model):
     follower = models.ForeignKey('user_login.User', related_name='following', on_delete=models.CASCADE)
     followed = models.ForeignKey('user_login.User', related_name='followed', on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = EncryptedDateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('follower', 'followed')
@@ -20,34 +21,34 @@ class Follow(models.Model):
 
 
 class DiscussionGroup(models.Model):
-    name = models.CharField(max_length=255)
-    description = models.TextField(blank=True, null=True)
+    name = EncryptedCharField(max_length=255)
+    description = EncryptedTextField(blank=True, null=True)
     created_by = models.ForeignKey('user_login.User', on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    content = EncryptedTextField()
+    created_at = EncryptedDateTimeField(auto_now_add=True)
 
 class GroupPost(models.Model):
     group = models.ForeignKey(DiscussionGroup, on_delete=models.CASCADE)
     user = models.ForeignKey('user_login.User', on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
+    content = EncryptedTextField()
+    created_at = EncryptedDateTimeField(auto_now_add=True)
 
 
 class Tag(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    created_at = models.DateTimeField(auto_now_add=True)
+    name = EncryptedCharField(max_length=100)
+    created_at = EncryptedDateTimeField(auto_now_add=True)
 
 class PostTag(models.Model):
     post = models.ForeignKey(GroupPost, on_delete=models.CASCADE)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = EncryptedDateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('post', 'tag')
 
 class Category(models.Model):
-    name = models.CharField(max_length=100, unique=True)
-    description = models.TextField(blank=True)
+    name = EncryptedCharField(max_length=100)
+    description = EncryptedTextField(blank=True)
 
     def __str__(self):
         return self.name
@@ -58,12 +59,12 @@ class Category(models.Model):
 class Post(models.Model):
     # group = models.ForeignKey('social_community.DiscussionGroup', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
-    content = models.TextField()
+    content = EncryptedTextField()
     image = models.ImageField(upload_to='posts/images/', blank=True, null=True)
     video = models.FileField(upload_to='posts/videos/', blank=True, null=True)
     category = models.ForeignKey(Category, related_name='posts', on_delete=models.SET_NULL, null=True, blank=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now_add=True)
+    created_at = EncryptedDateTimeField(auto_now_add=True)
+    updated_at = EncryptedDateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at'] #Newest posts first 

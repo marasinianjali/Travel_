@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from apps.tour_package.models import TourPackage
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
 
 
 class ExpenseCategory(models.Model):
@@ -46,7 +47,7 @@ class Expense(models.Model):
         verbose_name="Expense Date",
         help_text="Select the date the expense was incurred."
     )
-    description = models.TextField(
+    description = EncryptedTextField(
         blank=True,
         null=True,
         verbose_name="Description",

@@ -2,29 +2,46 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
+from fernet_fields import EncryptedCharField
 from django.utils.html import strip_tags
 import bleach
 
+from fernet_fields import EncryptedField
+from django.db import models
+from decimal import Decimal
+class EncryptedDecimalField(EncryptedField, models.TextField):
+    def get_prep_value(self, value):
+        if value is None:
+            return value
+        return str(Decimal(value))  # Convert to string for encryption
+
+    def to_python(self, value):
+        if value is None:
+            return value
+        try:
+            return Decimal(value)
+        except:
+            return Decimal('0.00')
+
+
 class Location(models.Model):
-    name = models.CharField(
+    name = EncryptedCharField(
         max_length=255,
         verbose_name="Location Name",
         help_text="Enter the name of the location, e.g., City or Landmark."
     )
-    latitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        validators=[MinValueValidator(-90), MaxValueValidator(90)],
-        verbose_name="Latitude",
-        help_text="Latitude of the location. Must be between -90 and 90."
-    )
-    longitude = models.DecimalField(
-        max_digits=9,
-        decimal_places=6,
-        validators=[MinValueValidator(-180), MaxValueValidator(180)],
-        verbose_name="Longitude",
-        help_text="Longitude of the location. Must be between -180 and 180."
-    )
+    latitude = EncryptedDecimalField(
+    validators=[MinValueValidator(-90), MaxValueValidator(90)],
+    verbose_name="Latitude",
+    help_text="Latitude of the location. Must be between -90 and 90."
+)
+
+    longitude = EncryptedDecimalField(
+    validators=[MinValueValidator(-180), MaxValueValidator(180)],
+    verbose_name="Longitude",
+    help_text="Longitude of the location. Must be between -180 and 180."
+)
+
     languages = models.ManyToManyField(
         'Language',
         related_name='locations',
