@@ -47,6 +47,21 @@
         .category {
             margin-bottom: 20px;
         }
+        /* Pagination Styling */
+        .pagination {
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .page-item.active .page-link {
+            background-color: #3498db;
+            border-color: #3498db;
+        }
+        .page-link {
+            color: #3498db;
+        }
+        .page-link:hover {
+            background-color: #e9ecef;
+        }
     </style>
 </head>
 <body>
@@ -92,6 +107,39 @@
                     <a href="{% url 'travel_stories:post_detail' post_id=post.id %}" class="btn btn-primary btn-sm mt-2">View Details</a>
                 </div>
             {% endfor %}
+
+            <!-- Pagination for Posts -->
+            {% if posts.has_other_pages %}
+                <nav aria-label="Posts pagination">
+                    <ul class="pagination">
+                        {% if posts.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?posts_page={{ posts.previous_page_number }}&articles_page={{ articles.number }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in posts.paginator.page_range %}
+                            <li class="page-item {% if posts.number == num %}active{% endif %}">
+                                <a class="page-link" href="?posts_page={{ num }}&articles_page={{ articles.number }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {% if posts.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?posts_page={{ posts.next_page_number }}&articles_page={{ articles.number }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
         {% else %}
             <p>No user stories yet. Share yours on the <a href="{% url 'social_community:community_features' %}">Community Features</a> page!</p>
         {% endif %}
@@ -113,11 +161,44 @@
                     </p>
                     <p>{{ article.content|truncatewords:50 }}</p>
                     {% if article.image %}
-                        <img src="{{ article.image.url }}" alt="Article Image" style="height:12px;">
+                        <img src="{{ article.image.url }}" alt="Article Image">
                     {% endif %}
                     <a href="{% url 'travel_stories:article_detail' article_id=article.id %}" class="btn btn-primary btn-sm mt-2">Read More</a>
                 </div>
             {% endfor %}
+
+            <!-- Pagination for Articles -->
+            {% if articles.has_other_pages %}
+                <nav aria-label="Articles pagination">
+                    <ul class="pagination">
+                        {% if articles.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?articles_page={{ articles.previous_page_number }}&posts_page={{ posts.number }}">Previous</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Previous</span>
+                            </li>
+                        {% endif %}
+
+                        {% for num in articles.paginator.page_range %}
+                            <li class="page-item {% if articles.number == num %}active{% endif %}">
+                                <a class="page-link" href="?articles_page={{ num }}&posts_page={{ posts.number }}">{{ num }}</a>
+                            </li>
+                        {% endfor %}
+
+                        {% if articles.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?articles_page={{ articles.next_page_number }}&posts_page={{ posts.number }}">Next</a>
+                            </li>
+                        {% else %}
+                            <li class="page-item disabled">
+                                <span class="page-link">Next</span>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
         {% else %}
             <p>No articles yet.</p>
         {% endif %}
@@ -138,6 +219,7 @@
             <p>No news updates available.</p>
         {% endif %}
 
+       
         <a href="{% url 'user_login:user_dashboard' %}" class="btn btn-secondary mt-3">Back to Dashboard</a>
     </div>
 

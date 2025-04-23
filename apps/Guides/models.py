@@ -5,10 +5,13 @@ from django.core.exceptions import ValidationError
 from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField, EncryptedEmailField
 from django.utils.text import slugify
 
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+
 
 from fernet_fields import EncryptedField
 from django.db import models
 from decimal import Decimal
+
 
 class EncryptedDecimalField(EncryptedField, models.TextField):
     def get_prep_value(self, value):
@@ -132,7 +135,7 @@ class Guide(BasePerson):
         help_text="Set the standard rate per assignment."
     )
    
-    image = models.BinaryField(
+    image = models.ImageField(
         null=True,
         blank=True,
         verbose_name="Profile Image",
@@ -174,3 +177,47 @@ class Guide(BasePerson):
         db_table = 'Guides'
         verbose_name = "Tour Guide"
         verbose_name_plural = "Tour Guides"
+
+
+
+# Custom user manager
+class UserBaseManager(BaseUserManager):
+    def create_user(self, email, name, phone, password=None, **extra_fields):
+        if not email:
+            raise ValueError("The Email field must be set")
+        email = self.normalize_email(email)
+        user = self.model(email=email, name=name, phone=phone, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
+
+    def create_superuser(self, email, name, phone, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_user(email, name, phone, password, **extra_fields)
+
+
+# Custom user model
+class UserBase(BasePerson, AbstractBaseUser, PermissionsMixin):
+    is_active = models.BooleanField(default=True)
+    is_staff = models.BooleanField(default=False)
+    date_joined = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(unique=True, blank=True)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['name', 'phone']
+
+    objects = UserBaseManager()
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+    def __str__ (self):
+        return self.email
+
+    class Meta:
+        db_table = 'UserBase'
+        verbose_name = "User"
+        verbose_name_plural = "Users"

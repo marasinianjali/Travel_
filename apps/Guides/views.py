@@ -4,6 +4,9 @@ from django.utils.text import slugify
 from .forms import GuideForm
 from .models import Guide
 from django.http import HttpResponseForbidden
+from django.contrib.auth import authenticate, login
+from .forms import GuideForm, UserBaseCreationForm
+from .models import Guide, UserBase
 
 
 # Custom test function to check if the user is an admin
@@ -93,3 +96,37 @@ def guide_delete(request, pk):
         guide.delete()
         return redirect('guide_list')
     return render(request, 'guides/guide_confirm_delete.html', {'guide': guide})
+
+
+# -------------------- USER VIEWS (Admin Only) --------------------
+
+@login_required
+@user_passes_test(is_admin)
+def user_create(request):
+    form = UserBaseCreationForm(request.POST or None)
+    if request.method == 'POST' and form.is_valid():
+        form.save()
+        return redirect('user_list')
+    return render(request, 'users/user_form.html', {'form': form})
+
+
+@login_required
+@user_passes_test(is_admin)
+def user_list(request):
+    users = UserBase.objects.all()
+    return render(request, 'users/user_list.html', {'users': users})
+
+
+# -------------------- OPTIONAL: Custom Login View --------------------
+
+def custom_login_view(request):
+    if request.method == 'POST':
+        email = request.POST['email']
+        password = request.POST['password']
+        user = authenticate(request, email=email, password=password)
+        if user is not None:
+            login(request, user)
+            return redirect('guide_list')  # or 'dashboard' or anywhere
+        else:
+            return render(request, 'users/login.html', {'error': 'Invalid credentials'})
+    return render(request, 'users/login.html')

@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator
 from django.core.exceptions import ValidationError
 from apps.tour_package.models import TourPackage
+from apps.hotelbooking.models import HotelBooking
+from apps.Guides.models import Guide
 from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
 
 
@@ -67,6 +69,22 @@ class Expense(models.Model):
         null=True,
         blank=True,
         verbose_name="Tour Package",
+        help_text="Optional associated tour package."
+    )
+    hotelbooking = models.ForeignKey(
+        HotelBooking,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="hotelbooking",
+        help_text="Optional associated tour package."
+    )
+    Guides = models.ForeignKey(
+        Guide,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        verbose_name="Guides",
         help_text="Optional associated tour package."
     )
 
