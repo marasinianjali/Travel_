@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from cryptography.fernet import Fernet
 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -184,7 +185,7 @@ SESSION_COOKIE_SECURE = True  # If using HTTPS
 AXES_LOCKOUT_TEMPLATE = 'user_login/account_locked.html'
 
 
-# For decimalencryption 
-FIELD_ENCRYPTION_KEYS = [b'7\xb9[d,q\xf9?\xb7D\x94\x13\xc9\xcbQ \x18\xce\xf8\x05\x03\x14\xb66,\x81\x82\xfaM\xff~\x04']
-
+FERNET_KEY = config('FERNET_KEY')
+FERNET_KEYS = [FERNET_KEY]
+FERNET_INSTANCES = [Fernet(key.encode()) for key in FERNET_KEYS]
 

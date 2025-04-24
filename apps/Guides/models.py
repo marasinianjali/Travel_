@@ -3,28 +3,37 @@ from django.core.validators import MinValueValidator, MaxValueValidator, RegexVa
 
 from django.core.exceptions import ValidationError
 from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedField, EncryptedEmailField
-
-
+from cryptography.fernet import Fernet, InvalidToken
 from decimal import Decimal
 
 
-class EncryptedDecimalField(EncryptedField, models.TextField):
-    def get_prep_valueto(self, value):
+from django.conf import settings
+
+# Use your first Fernet key from settings
+fernet = Fernet(settings.FERNET_KEYS[0].encode())
+
+class EncryptedDecimalField(models.TextField):
+    def get_prep_value(self, value):
         if value is None:
             return value
-        return str(Decimal(value))  # Convert to string for encryption
+        # Convert to string and encrypt
+        encrypted_value = fernet.encrypt(str(value).encode())
+        return encrypted_value.decode()  # Save as string in DB
+
+    def from_db_value(self, value, expression, connection):
+        return self.to_python(value)
 
     def to_python(self, value):
         if value is None:
             return value
-        if value is none:
-            return value
         try:
-            return Decimal(value)
-        except exception as e:
-            # Handle the exception or log it
-            raise ValidationError(f"Invalid decimal value: {value}") from e
-            return Decimal('0.00')
+            # Decrypt and convert to Decimal
+            decrypted_value = fernet.decrypt(value.encode()).decode()
+            return Decimal(decrypted_value)
+        except (InvalidToken, ValueError) as e:
+            raise ValidationError(f"Invalid encrypted decimal value: {value}") from e
+
+
 
 # Abstract base model for common fields
 

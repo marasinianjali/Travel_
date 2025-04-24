@@ -62,3 +62,5 @@ class ReviewForm(forms.ModelForm):
                 raise ValidationError("File size too large. Maximum allowed is 5MB.")
         
         return photo
+    
+    
