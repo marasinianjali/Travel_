@@ -56,6 +56,12 @@ class TourPackage(models.Model):
         verbose_name="Created At",
         help_text="Timestamp when the tour package was created."
     )
+    is_approved = models.BooleanField(
+        default=False,
+        verbose_name="Is Approved",
+        help_text="Indicates if the tour package has been approved."
+    )
+
 
     def __str__(self):
         return self.package_name

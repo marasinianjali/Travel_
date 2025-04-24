@@ -2,19 +2,14 @@ from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 
 from django.core.exceptions import ValidationError
-from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField, EncryptedEmailField
-from django.utils.text import slugify
-
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedField, EncryptedEmailField
 
 
-from fernet_fields import EncryptedField
-from django.db import models
 from decimal import Decimal
 
 
 class EncryptedDecimalField(EncryptedField, models.TextField):
-    def get_prep_value(self, value):
+    def get_prep_valueto(self, value):
         if value is None:
             return value
         return str(Decimal(value))  # Convert to string for encryption
@@ -22,9 +17,13 @@ class EncryptedDecimalField(EncryptedField, models.TextField):
     def to_python(self, value):
         if value is None:
             return value
+        if value is none:
+            return value
         try:
             return Decimal(value)
-        except:
+        except exception as e:
+            # Handle the exception or log it
+            raise ValidationError(f"Invalid decimal value: {value}") from e
             return Decimal('0.00')
 
 # Abstract base model for common fields
@@ -141,23 +140,14 @@ class Guide(BasePerson):
         verbose_name="Profile Image",
         help_text="Guide's image stored as binary data."
     )
-    rating = models.FloatField(
-        default=0.0,
-        validators=[MinValueValidator(0.0), MaxValueValidator(5.0)],
-        verbose_name="Rating",
-        help_text="Average rating (0.0–5.0) from reviews."
-    )
+    
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp of when the guide was added."
     )
-    slug = models.SlugField(
-        blank=True,
-        null=True,
-        unique=False,
-        help_text="Auto-generated slug from name"
-    )
+   
+    
     def __str__(self):
         return self.name
 
@@ -168,56 +158,10 @@ class Guide(BasePerson):
         if self.rating < 0 or self.rating > 5:
             raise ValidationError("Rating must be between 0.0 and 5.0.")
 
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
+    
     class Meta:
         db_table = 'Guides'
         verbose_name = "Tour Guide"
         verbose_name_plural = "Tour Guides"
 
 
-
-# Custom user manager
-class UserBaseManager(BaseUserManager):
-    def create_user(self, email, name, phone, password=None, **extra_fields):
-        if not email:
-            raise ValueError("The Email field must be set")
-        email = self.normalize_email(email)
-        user = self.model(email=email, name=name, phone=phone, **extra_fields)
-        user.set_password(password)
-        user.save(using=self._db)
-        return user
-
-    def create_superuser(self, email, name, phone, password=None, **extra_fields):
-        extra_fields.setdefault('is_staff', True)
-        extra_fields.setdefault('is_superuser', True)
-        return self.create_user(email, name, phone, password, **extra_fields)
-
-
-# Custom user model
-class UserBase(BasePerson, AbstractBaseUser, PermissionsMixin):
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateTimeField(auto_now_add=True)
-    slug = models.SlugField(unique=True, blank=True)
-
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['name', 'phone']
-
-    objects = UserBaseManager()
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.name)
-        super().save(*args, **kwargs)
-
-    def __str__ (self):
-        return self.email
-
-    class Meta:
-        db_table = 'UserBase'
-        verbose_name = "User"
-        verbose_name_plural = "Users"

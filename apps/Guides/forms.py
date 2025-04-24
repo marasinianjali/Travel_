@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator, EmailValidator
 from .models import Guide
 from django.contrib.auth.forms import UserCreationForm
-from .models import Guide, UserBase  # Make sure UserBase is your custom user model
+ # Make sure UserBase is your custom user model
 
 class GuideForm(forms.ModelForm):
     # Custom fields
@@ -57,30 +57,3 @@ class GuideForm(forms.ModelForm):
         if rating < 0.0 or rating > 5.0:
             raise forms.ValidationError("Rating must be between 0.0 and 5.0.")
         return rating
-
-class UserBaseCreationForm(UserCreationForm):
-    email = forms.EmailField(
-        max_length=254,
-        required=True,
-        validators=[EmailValidator()],
-        widget=forms.EmailInput(attrs={'class': 'form-control'})
-    )
-    first_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-    last_name = forms.CharField(
-        max_length=30,
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control'})
-    )
-
-    class Meta:
-        model = UserBase
-        fields = ('username', 'email', 'first_name', 'last_name', 'password1', 'password2')
-        widgets = {
-            'username': forms.TextInput(attrs={'class': 'form-control'}),
-            'password1': forms.PasswordInput(attrs={'class': 'form-control'}),
-            'password2': forms.PasswordInput(attrs={'class': 'form-control'}),
-        }

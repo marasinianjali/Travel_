@@ -12,16 +12,20 @@ from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import InMemoryUploadedFile
 
 @csrf_protect
-@login_required
+
 def review_list(request):
+    if "user_id" not in request.session:
+        return redirect("user-login")
     # Using select_related properly with specific fields
     reviews = Review.objects.select_related(
-        'user', 'package', 'guide', 'hotel', 'company'
-    ).only(
-        'user__username', 'rating', 'review_text', 'created_at',
-        'package__name', 'guide__name', 'hotel__name', 'company__name'
-    ).order_by('-created_at')[:10]
-    
+    'user', 'package', 'guide', 'hotel', 'company'  # Assuming 'hotel' is a related field
+).only(
+    'user__username', 'rating', 'review_text', 'created_at',
+    'package__package_name',  # Ensure this matches your actual field name
+    'guide__name', 'hotel__hotel_name',  # Correctly accessing hotel_name
+    'company__company_name'
+).order_by('-created_at')[:10]
+
     return render(request, 'review/review_list.html', {
         'reviews': reviews,
         'user': request.user  # Pass user to template for permission checks
@@ -29,8 +33,10 @@ def review_list(request):
 
 @csrf_protect
 @transaction.atomic
-@login_required
+
 def add_review(request):
+    if "user_id" not in request.session:
+        return redirect("user-login")
     if request.method == "POST":
         form = ReviewForm(request.POST, request.FILES)
         if form.is_valid():

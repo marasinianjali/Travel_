@@ -30,7 +30,7 @@
                 <div class="card text-white bg-primary mb-3">
                     <div class="logout-body">
                         
-                        <a href="{% url 'user_login:user_bookings' %}">My Bookings</a>
+                        <a href="">My Bookings</a>
 
                     </div>
                 </div>
@@ -79,6 +79,16 @@
                     <h5 class="card-title">Available Guides</h5>
                     <p class="card-text">{{ total_guides }}</p>
                     <a href="{% url 'Guides:guide_list' %}" class="btn btn-light">View Guides</a>
+                </div>
+            </div>
+        </div>
+          <!-- Hotel (Only View) -->
+          <div class="col-md-4">
+            <div class="card text-white bg-danger mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">Available Hotel</h5>
+                    <p class="card-text">{{ total_hotel }}</p>
+                    <a href="{% url 'hotelbooking:hotel_booking_list' %}" class="btn btn-light">View Hotels</a>
                 </div>
             </div>
         </div>

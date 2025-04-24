@@ -7,7 +7,7 @@ urlpatterns = [
     path('<int:pk>/', views.guide_edit_delete, name='guide_detail'),
     path('<int:pk>/edit/', views.guide_update, name='guide_update'),
     path('<int:pk>/delete/', views.guide_delete, name='guide_delete'),
-    path('guide/<int:guide_id>/', views.guide_view, name='guide_view'),
+    path('guide/<slug:slug>/', views.guide_view, name='guide_view'),
 
 ]
 

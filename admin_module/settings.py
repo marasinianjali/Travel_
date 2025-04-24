@@ -187,4 +187,4 @@ AXES_LOCKOUT_TEMPLATE = 'user_login/account_locked.html'
 # For decimalencryption 
 FIELD_ENCRYPTION_KEYS = [b'7\xb9[d,q\xf9?\xb7D\x94\x13\xc9\xcbQ \x18\xce\xf8\x05\x03\x14\xb66,\x81\x82\xfaM\xff~\x04']
 
-AUTH_USER_MODEL = 'Guides.UserBase'
+

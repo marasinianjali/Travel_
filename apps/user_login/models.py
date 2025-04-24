@@ -19,7 +19,7 @@ class BaseModel(models.Model):
 class LoginAdmin(models.Model):
     username = models.CharField(max_length=100, unique=True)
     email = models.EmailField(max_length=100, unique=True)
-    password = EncryptedCharField(max_length=100)
+    password = models.CharField(max_length=100) # Using char field because we're using save method to hash the password
     role = models.CharField(max_length=100)
 
     def __str__(self):
@@ -38,7 +38,10 @@ class User(models.Model):
     id = models.AutoField(primary_key=True)
     name = models.CharField(max_length=100, null=False, verbose_name="User Name", help_text="Enter the user's full name.")
     email = models.EmailField(max_length=55, unique=True, null=False, verbose_name="Email Address", help_text="Enter a valid email address.")
-    password = EncryptedCharField(max_length=255, null=False, verbose_name="Password", help_text="Password will be hashed before saving.")
+    
+    password = models.CharField(max_length=255, null=False, verbose_name="Password", 
+                                  help_text="Password will be hashed before saving.")
+    
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Phone Number", help_text="Enter a phone number.")
     address = models.CharField(max_length=255, blank=True, null=True, verbose_name="Address", help_text="Enter user's address.")
     gender = models.CharField(max_length=20, choices=[('male', 'Male'), ('female', 'Female'), ('other', 'Other')], blank=True, null=True, verbose_name="Gender")
@@ -143,3 +146,5 @@ class Guide(BaseModel):
         verbose_name = "Tour Guide"
         verbose_name_plural = "Tour Guides" 
 
+
+    

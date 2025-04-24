@@ -1,12 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required, user_passes_test
-from django.utils.text import slugify
 from .forms import GuideForm
 from .models import Guide
 from django.http import HttpResponseForbidden
 from django.contrib.auth import authenticate, login
-from .forms import GuideForm, UserBaseCreationForm
-from .models import Guide, UserBase
 
 
 # Custom test function to check if the user is an admin
@@ -34,9 +31,9 @@ def guide_list(request):
     })
 
 
-# View a single guide by slug
-def guide_view(request, slug):
-    guide = get_object_or_404(Guide, slug=slug)
+# View a single guide by primary key
+def guide_view(request, pk):
+    guide = get_object_or_404(Guide, pk=pk)
     return render(request, 'guides/guide_view.html', {'guide': guide})
 
 
@@ -56,12 +53,10 @@ def guide_create(request):
         form = GuideForm(request.POST, request.FILES)
         if form.is_valid():
             guide = form.save(commit=False)
-            
             guide.save()
             form.save_m2m()
             return redirect('guide_list')
         else:
-            # If the form is not valid, return the form with errors
             return render(request, 'guides/guide_form.html', {'form': form})
     else:
         form = GuideForm()
@@ -77,12 +72,10 @@ def guide_update(request, pk):
     if request.method == 'POST':
         if form.is_valid():
             updated_guide = form.save(commit=False)
-            updated_guide.slug = slugify(updated_guide.name)
             updated_guide.save()
             form.save_m2m()
             return redirect('guide_list')
         else:
-            # If the form is not valid, return the form with errors
             return render(request, 'guides/guide_form.html', {'form': form, 'guide': guide})
     return render(request, 'guides/guide_form.html', {'form': form, 'guide': guide})
 
@@ -126,7 +119,7 @@ def custom_login_view(request):
         user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('guide_list')  # or 'dashboard' or anywhere
+            return redirect('guide_list')
         else:
             return render(request, 'users/login.html', {'error': 'Invalid credentials'})
     return render(request, 'users/login.html')
