@@ -31,8 +31,15 @@ def hotel_rooms_list(request):
 @user_passes_test(is_admin)
 def add_hotel_room(request):
     if request.method == 'POST':
+
         hotel_id = request.POST.get('hotel_id')
         hotel = get_object_or_404(HotelBooking, id=hotel_id)
+        
+        if hotel.is_valid():
+            room = hotel.save(commit=False)
+            room.is_approved = False
+
+
         room = HotelRoom(
             hotel=hotel,
             room_number=request.POST.get('room_number'),

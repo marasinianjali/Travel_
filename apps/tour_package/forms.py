@@ -13,7 +13,7 @@ class TourPackageForm(forms.ModelForm):
         fields = '__all__'  # Includes all fields
 
     def __init__(self, *args, **kwargs):
-        user_role = kwargs.pop('user_role', None)  # Get user role from kwargs
+        user_role = kwargs.pop('user_role', "TourismCompany")  # Get user role from kwargs
         super(TourPackageForm, self).__init__(*args, **kwargs)
         
         # Disable "is_approved" if the user is a Tourism Company

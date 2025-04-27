@@ -57,3 +57,12 @@ class GuideForm(forms.ModelForm):
         if rating < 0.0 or rating > 5.0:
             raise forms.ValidationError("Rating must be between 0.0 and 5.0.")
         return rating
+
+    def __init__(self, *args, **kwargs):
+        user_role = kwargs.pop('user_role', "Guides")
+        super().__init__(*args, **kwargs)
+
+        if user_role == "Guides":
+            self.fields['is_approved'].disabled = True
+            self.fields['is_approved'].widget.attrs['readonly'] = True
+        

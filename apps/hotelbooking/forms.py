@@ -54,6 +54,13 @@ class HotelRevenueFilterForm(forms.ModelForm):
         model = HotelRevenue
         fields = '__all__'
 
+    def __init__(self, *args, **kwargs):
+        user_role = kwargs.pop('user_role', "")
+        super().__init__(*args, **kwargs)
+        if user_role == "HotelCompany":
+            self.fields['hotel_name'].disabled = True
+            self.fields['hotel_name'].widget.attrs['readonly'] = True
+
 
 # -------------------------
 # Room Availability Form

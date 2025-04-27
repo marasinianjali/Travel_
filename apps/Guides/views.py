@@ -52,7 +52,12 @@ def guide_create(request):
     if request.method == 'POST':
         form = GuideForm(request.POST, request.FILES)
         if form.is_valid():
+            
+
             guide = form.save(commit=False)
+            
+            guide.is_approved = False  # Set to False by default
+
             guide.save()
             form.save_m2m()
             return redirect('guide_list')
