@@ -63,7 +63,8 @@ INSTALLED_APPS = [
     'apps.maps',
     'apps.social_stories',
     'axes',
-    
+    'rest_framework',
+    'rest_framework.authtoken',
 ]   
 
 MIDDLEWARE = [

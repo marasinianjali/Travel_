@@ -27,6 +27,11 @@ class DiscussionGroup(models.Model):
     content = EncryptedTextField()
     created_at = EncryptedDateTimeField(auto_now_add=True)
 
+    class Meta:
+        
+        db_table = 'discussion_groups'  # Tell Django to use the existing 'follows' table
+
+
 class GroupPost(models.Model):
     group = models.ForeignKey(DiscussionGroup, on_delete=models.CASCADE)
     user = models.ForeignKey('user_login.User', on_delete=models.CASCADE)

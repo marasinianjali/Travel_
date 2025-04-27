@@ -98,6 +98,7 @@ class HotelBooking(models.Model):
     amount = EncryptedDecimalField(default=1000.00, 
                                    validators=[MinValueValidator(0.01)], 
                                    verbose_name="Base Amount")
+    
     photo = models.ImageField(upload_to="hotel_photos/", null=True, blank=True, verbose_name="Hotel Photo")
     hotel_address = models.CharField(max_length=255, verbose_name="Hotel Address")
     contact_number = EncryptedCharField(max_length=20, verbose_name="Contact Number")
@@ -127,8 +128,10 @@ class HotelBooking(models.Model):
             raise ValidationError("Checkout time must be after arrival time.")
 
     class Meta:
+        db_table = "hotelbooking"
         verbose_name = "Hotel Booking"
         verbose_name_plural = "Hotel Bookings"
+
 
 
 class HotelRoom(models.Model):
