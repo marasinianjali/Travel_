@@ -36,6 +36,8 @@ urlpatterns = [
     path('maps/', include(('apps.maps.urls', 'maps'), namespace='maps')),
     path('social_stories/', include(('apps.social_stories.urls', 'social_stories'), namespace='social_stories')),
     
+
+   
 ]
 
 

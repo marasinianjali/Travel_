@@ -62,6 +62,7 @@ INSTALLED_APPS = [
     'apps.expense_tracker',
     'apps.maps',
     'apps.social_stories',
+ 
     'axes',
     'rest_framework',
     'rest_framework.authtoken',
@@ -190,3 +191,15 @@ FERNET_KEY = config('FERNET_KEY')
 FERNET_KEYS = [FERNET_KEY]
 FERNET_INSTANCES = [Fernet(key.encode()) for key in FERNET_KEYS]
 
+
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+        'rest_framework.filters.OrderingFilter',  
+        'rest_framework.filters.SearchFilter', 
+        ]
+}
+REST_FRAMEWORK = {
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}

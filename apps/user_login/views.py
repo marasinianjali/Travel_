@@ -1,30 +1,37 @@
 
 
+# Django imports
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.models import User as AuthUser
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import check_password
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse
-from django.contrib.auth.models import User as AuthUser
-from .models import User, Wishlist, Trip, Notification
-from .forms import WishlistForm, TripForm, ProfileUpdateForm, NotificationForm, UserForm, SignupForm, LoginForm, UserLoginForm
+from django.utils.timezone import now
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Sum
 from django.db import connection
+from django.views.generic import ListView
+
+# Third-party imports
+from axes.helpers import get_lockout_response
+
+# Local app imports
+from .models import User, Wishlist, Trip, Notification
+from .forms import WishlistForm, TripForm, ProfileUpdateForm, NotificationForm, UserForm, SignupForm, LoginForm, UserLoginForm
+
 from apps.bookings.models import Booking
 from apps.Guides.models import Guide
 from apps.reviews.models import Review
 from apps.Payments.models import Payment
 from apps.tour_package.models import TourPackage
 from apps.tourism_company.models import TourismCompany
-from django.contrib.auth.hashers import check_password
-from apps.social_community.models import Follow
+from apps.social_community.models import Follow, Post
 from apps.social_community.forms import FollowUserForm
-from apps.social_community.models import Post
-from django.views.generic import ListView
 
+# Standard library imports
 import logging
-from django.utils.timezone import now
-from axes.helpers import get_lockout_response
+
 # for user login to check supsicious login attempts
 logger = logging.getLogger(__name__)
 
