@@ -120,15 +120,16 @@
         <p>No guides found.</p>
     {% endif %}
                     {% if user_role == "Guest" %}
-                        <div class="add-new-guide">
+                       
+                    <a href="{% url 'user_login:user_dashboard' %}">Back</a>
+                    {% else %}
+                     <div class="add-new-guide">
                             <a href="{% url 'Guides:guide_create' %}">Add New Guide</a>
                             <a href="{% url 'user_login:admin-dashboard' %}">Back</a>
                          
                         </div>
-                    
-                    {% else %}
-                    <a href="{% url 'user_login:user_dashboard' %}">Back</a>
                     {% endif %}
+
                 
           
          

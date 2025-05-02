@@ -37,7 +37,9 @@ urlpatterns = [
     path('social_stories/', include(('apps.social_stories.urls', 'social_stories'), namespace='social_stories')),
     
 
-   
+   # API Endpoints
+    path('tourism_company/api/', include(('apps.tourism_company_api.urls', 'tourism_company_api'), namespace='tourism_company_api')),
+    path('reviews/api/', include(('apps.reviews_api.urls', 'reviews_api'), namespace='reviews_api')),
 ]
 
 

@@ -57,7 +57,7 @@ def company_logout(request):
 
 # ------------------- Company Dashboard -------------------
 
-@login_required
+
 def company_dashboard_view(request):
     if request.session.get('user_role') != 'TourismCompany':
         return HttpResponseForbidden("Unauthorized access")

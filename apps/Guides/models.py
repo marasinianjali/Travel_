@@ -13,6 +13,7 @@ from django.conf import settings
 fernet = Fernet(settings.FERNET_KEYS[0].encode())
 
 class EncryptedDecimalField(models.TextField):
+    
     def get_prep_value(self, value):
         if value is None:
             return value
@@ -60,16 +61,8 @@ class BasePerson(models.Model):
         abstract = True
 
 
-class Language(models.Model):
-    name = models.CharField(
-        max_length=50,
-        unique=True,
-        verbose_name="Language",
-        help_text="Name of the spoken language."
-    )
 
-    def __str__(self):
-        return self.name
+    
 
 
 class Guide(BasePerson):
@@ -114,12 +107,12 @@ class Guide(BasePerson):
         verbose_name="About the Guide",
         help_text="Brief summary about the guide."
     )
-    languages = models.ManyToManyField(
-        to='Language',
+    language = EncryptedCharField(
+        max_length=255,
         verbose_name="Languages Spoken",
-        help_text="Comma-separated languages spoken by the guide."
-
+        help_text="Comma-separated list of languages."
     )
+
     location = models.CharField(
         max_length=100,
         choices=LOCATION_CHOICES,
@@ -164,12 +157,11 @@ class Guide(BasePerson):
         # Example model-level validation
         if self.experience < 0 or self.experience > 60:
             raise ValidationError("Experience must be between 0 and 60 years.")
-        if self.rating < 0 or self.rating > 5:
-            raise ValidationError("Rating must be between 0.0 and 5.0.")
+       
 
     
     class Meta:
-        db_table = 'Guides'
+       
         verbose_name = "Tour Guide"
         verbose_name_plural = "Tour Guides"
 

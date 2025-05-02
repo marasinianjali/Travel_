@@ -1,11 +1,14 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.forms import ValidationError
 from apps.tourism_company.models import TourismCompany
 from apps.tour_package.models import TourPackage
 from apps.Guides.models import Guide
 from apps.hotelbooking.models import HotelBooking
 from django.core.validators import FileExtensionValidator
-from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField
+from fernet_fields import  EncryptedTextField
+
+
 
 class Review(models.Model):
     review_id = models.AutoField(primary_key=True)

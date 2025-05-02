@@ -62,10 +62,14 @@ INSTALLED_APPS = [
     'apps.expense_tracker',
     'apps.maps',
     'apps.social_stories',
- 
     'axes',
+    #for rest framework 
     'rest_framework',
     'rest_framework.authtoken',
+    # for apis
+    'apps.userlogin_api',
+    'apps.tourism_company_api',
+    'apps.reviews_api',
 ]   
 
 MIDDLEWARE = [

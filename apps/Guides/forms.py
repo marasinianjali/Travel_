@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django import forms
 from django.core.validators import RegexValidator, EmailValidator
 from .models import Guide
@@ -62,7 +63,19 @@ class GuideForm(forms.ModelForm):
         user_role = kwargs.pop('user_role', "Guides")
         super().__init__(*args, **kwargs)
 
-        if user_role == "Guides":
+        if user_role == "Guides" and 'is_approved' in self.fields:
             self.fields['is_approved'].disabled = True
             self.fields['is_approved'].widget.attrs['readonly'] = True
-        
+
+
+
+    def clean_amount(self):
+        amount = self.cleaned_data.get('amount')
+        if amount is not None:
+            # Convert to Decimal for validation
+            decimal_amount = Decimal(str(amount))
+            if decimal_amount < Decimal("0.00"):
+                raise forms.ValidationError("Amount must be a positive number.")
+            return str(decimal_amount)  # Return as string for encryption compatibility
+        return amount
+

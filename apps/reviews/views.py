@@ -14,8 +14,8 @@ from django.core.files.uploadedfile import InMemoryUploadedFile
 @csrf_protect
 
 def review_list(request):
-    if "user_id" not in request.session:
-        return redirect("user-login")
+    # if "user_id" not in request.session:
+    #     return redirect("user-login")
     # Using select_related properly with specific fields
     reviews = Review.objects.select_related(
     'user', 'package', 'guide', 'hotel', 'company'  # Assuming 'hotel' is a related field
