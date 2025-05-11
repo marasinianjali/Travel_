@@ -52,7 +52,4 @@ class CompanyLoginForm(forms.Form):
         max_length=255,
         widget=forms.TextInput(attrs={'class': 'form-control'})
     )
-    password = forms.CharField(
-        label="Password",
-        widget=forms.PasswordInput(attrs={'class': 'form-control'})
-    )
+  

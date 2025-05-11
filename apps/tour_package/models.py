@@ -1,4 +1,5 @@
 from django.db import models
+from apps.tourism_company.models import TourismCompany
 from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateTimeField, EncryptedEmailField
 
 class TourPackage(models.Model):
@@ -12,12 +13,7 @@ class TourPackage(models.Model):
         verbose_name="Package Name",
         help_text="Name of the tour package."
     )
-    company = models.CharField(
-        max_length=255,
-        blank=True,
-        verbose_name="Company",
-        help_text="Name of the tourism company offering this package."
-    )
+   
     date = models.DateField(
         verbose_name="Date",
         help_text="Date the tour package is scheduled for."
@@ -61,7 +57,14 @@ class TourPackage(models.Model):
         verbose_name="Is Approved",
         help_text="Indicates if the tour package has been approved."
     )
-
+    tourism_company = models.ForeignKey(
+        TourismCompany,
+        on_delete=models.CASCADE,
+        related_name='tour_packages',
+        verbose_name="Tourism Company",
+        help_text="Tourism company offering this package."
+    )
+    
 
     def __str__(self):
         return self.package_name

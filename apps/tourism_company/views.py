@@ -33,7 +33,7 @@ def company_login(request):
     if request.method == "POST":
         form = CompanyLoginForm(request.POST)
         if form.is_valid():
-            company_name = form.cleaned_data['company_name']
+            company_name = form.cleaned_data['company_name']  # ← this is correct
             try:
                 company = TourismCompany.objects.get(company_name=company_name)
                 request.session['company_id'] = company.company_id

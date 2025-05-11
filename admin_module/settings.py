@@ -66,10 +66,8 @@ INSTALLED_APPS = [
     #for rest framework 
     'rest_framework',
     'rest_framework.authtoken',
-    # for apis
-    'apps.userlogin_api',
-    'apps.tourism_company_api',
-    'apps.reviews_api',
+    'rest_framework_simplejwt',
+    
 ]   
 
 MIDDLEWARE = [
@@ -82,6 +80,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'axes.middleware.AxesMiddleware',
 ]
+REST_FRAMEWORK = {
+    
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
+    
+}
 
 ROOT_URLCONF = 'admin_module.urls'
 

@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
 from . import views
@@ -13,6 +13,9 @@ urlpatterns = [
     path("bookings/", views.company_bookings, name="company_bookings"),
     path('company/update/<int:pk>/', views.tourism_company_update, name='tourism_company_update'),
     path('company/delete/<int:pk>/', views.tourism_company_delete, name='tourism_company_delete'),
+
+    # API URLs
+    path('api/', include('apps.tourism_company.api_urls')),
 
 ]
 

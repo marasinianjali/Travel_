@@ -9,19 +9,22 @@ from apps.user_login.models import User
 
 
 # Custom check for admin
-def is_admin(user):
-    return user.is_superuser or hasattr(user, 'loginadmin')
+# def is_admin(user):
+#     return user.is_superuser or hasattr(user, 'loginadmin')
 
 
 # List all tour packages
+from django.utils.timezone import now
+from .models import TourPackage
+
 def tour_package_list(request):
     user_role = request.session.get('user_role')
 
     if user_role == "Admin":
         packages = TourPackage.objects.all()
     elif user_role == "TourCompany":
-        company_name = request.session.get('company_name')
-        packages = TourPackage.objects.filter(company_name=company_name)
+        company_id = request.session.get('company_id')  # Use company_id now
+        packages = TourPackage.objects.filter(tourism_company_id=company_id)
     else:
         packages = TourPackage.objects.filter(is_approved=True)
 
@@ -32,8 +35,9 @@ def tour_package_list(request):
     })
 
 
+
 # Add a new tour package
-@login_required
+
 def add_tour_package(request):
     user_role = request.session.get('user_role')
 
@@ -43,7 +47,7 @@ def add_tour_package(request):
             package = form.save(commit=False)
             package.is_approved = False
 
-            if user_role == 'TourCompany':
+            if user_role == 'TourismCompany':
                 company_id = request.session.get('company_id')
                 if company_id:
                     package.tourism_company_id = company_id
@@ -90,7 +94,7 @@ def delete_tour_package(request, package_id):
 
 # Admin review & approval page
 @login_required
-@user_passes_test(is_admin)
+
 def review_package(request, package_id):
     package = get_object_or_404(TourPackage, package_id=package_id)
 
@@ -104,7 +108,7 @@ def review_package(request, package_id):
 
 # Admin approve directly (staff-only)
 @login_required
-@user_passes_test(is_admin)
+
 def approve_tour_package(request, package_id):
     package = get_object_or_404(TourPackage, package_id=package_id)
     package.is_approved = True

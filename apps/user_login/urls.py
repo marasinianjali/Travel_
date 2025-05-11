@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from . import views
 
 
@@ -16,9 +16,7 @@ urlpatterns = [
 
     
     # Book a Tour: POST endpoint to book a tour package
-    
-
-
+   
     path('users/', views.user_list, name='user_list'),
     path('user/<int:user_id>/', views.view_user, name='view_user'), 
     path('users/create/', views.create_user, name='create_user'),
@@ -28,5 +26,8 @@ urlpatterns = [
     path("add-to-wishlist/", views.add_to_wishlist, name="add_to_wishlist"),
     path("add-trip/", views.add_trip, name="add_trip"),
     path("update-profile/", views.update_profile, name="update_profile"),
+
+    # APIs URLS
+    path('api/', include('apps.user_login.api_urls')),
     
 ]
