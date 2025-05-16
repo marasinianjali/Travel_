@@ -173,7 +173,7 @@ def article_detail(request, article_id):
     })
 
 # Like post
-@login_required
+
 def like_post(request, post_id):
     user = get_object_or_404(User, id=request.session['user_id'])
     post = get_object_or_404(Post, id=post_id)

@@ -1,0 +1,21 @@
+<!-- templates/user_login/update_wishlist.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Wishlist Item</title>
+</head>
+<body>
+    <h2>Update Wishlist Item: {{ wishlist_item.destination_name }}</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update Wishlist Item</button>
+    </form>
+    <a href="{% url 'user_login:user_details' %}">Back to Profile</a>
+</body>
+</html>

@@ -10,6 +10,7 @@ urlpatterns = [
     path('<int:pk>/edit/', views.guide_update, name='guide_update'),
     path('<int:pk>/delete/', views.guide_delete, name='guide_delete'),
     path('guide/<slug:slug>/', views.guide_view, name='guide_view'),
+    
     path('api/', include('apps.Guides.api_urls')),
 
 ]

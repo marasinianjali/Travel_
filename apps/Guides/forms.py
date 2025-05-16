@@ -67,15 +67,14 @@ class GuideForm(forms.ModelForm):
             self.fields['is_approved'].disabled = True
             self.fields['is_approved'].widget.attrs['readonly'] = True
 
-
-
     def clean_amount(self):
         amount = self.cleaned_data.get('amount')
         if amount is not None:
-            # Convert to Decimal for validation
-            decimal_amount = Decimal(str(amount))
-            if decimal_amount < Decimal("0.00"):
-                raise forms.ValidationError("Amount must be a positive number.")
-            return str(decimal_amount)  # Return as string for encryption compatibility
+            try:
+                decimal_amount = Decimal(str(amount))
+                if decimal_amount < Decimal('0.00'):
+                    raise forms.ValidationError("Amount must be a positive number.")
+                return decimal_amount  # Return Decimal, not string
+            except (ValueError, TypeError):
+                raise forms.ValidationError("Invalid amount format.")
         return amount
-

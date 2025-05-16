@@ -6,14 +6,11 @@ from .forms import BookingForm
 
 
 # Custom test function to check if the user is an admin
-def is_admin(user):
-    return user.is_superuser or hasattr(user, "loginadmin")
 
 
 
 def booking_list(request):
-    if "user_id" not in request.session:
-        return redirect("user_login:user-login")
+    
     bookings = Booking.objects.all()[:10]
     return render(request, 'bookings/booking_list.html', {'bookings': bookings})
 
@@ -21,12 +18,6 @@ def booking_list(request):
 from django.contrib.auth import get_user_model
 User = get_user_model()
 def create_booking(request):
-    if "user_id" not in request.session:
-        return redirect("user_login:user-login")
-    
-    user_id = request.session.get("user_id")
-    user = User.objects.get(id=user_id)
-
 
     if request.method == 'POST':
         form = BookingForm(request.POST)
@@ -43,8 +34,6 @@ def create_booking(request):
     return render(request, 'bookings/create_booking.html', {'form': form})
 
 
-
-@user_passes_test(is_admin)
 
 def edit_booking(request, booking_id):
     if "user_id" not in request.session:
@@ -63,8 +52,7 @@ def edit_booking(request, booking_id):
     return render(request, 'bookings/booking_form.html', {'form': form, 'booking': booking})
 
 
-@login_required
-@user_passes_test(is_admin)
+
 def delete_booking(request, booking_id):
     if "user_id" not in request.session:
         return redirect("user_login:user-login")

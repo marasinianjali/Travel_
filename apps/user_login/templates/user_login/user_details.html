@@ -40,6 +40,8 @@
             <ul>
                 {% for item in wishlist_items %}
                     <li>{{ item.destination_name }} - {{ item.description|default:"No description" }} (Added: {{ item.added_at }})</li>
+                    <a href="{% url 'user_login:update_wishlist' item.id %}" class="btn btn-warning">Edit</a>
+                    <a href="{% url 'user_login:delete_wishlist' item.id %}" class="btn btn-danger">Delete</a>
                 {% endfor %}
             </ul>
         {% else %}
@@ -61,6 +63,9 @@
         <ul>
             {% for trip in trips %}
                 <li>{{ trip.destination }} ({{ trip.start_date }} to {{ trip.end_date }}) - Status: {{ trip.status }}</li>
+
+                <a href="{% url 'user_login:update_trip' trip.id %}" class="btn btn-warning">Edit</a>
+                <a href="{% url 'user_login:delete_trip' trip.id %}" class="btn btn-danger">Delete</a>
             {% endfor %}
         </ul>
     {% else %}

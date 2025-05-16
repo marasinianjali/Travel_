@@ -6,7 +6,7 @@ from fernet_fields import EncryptedCharField, EncryptedTextField, EncryptedDateT
 class Follow(models.Model):
     follower = models.ForeignKey('user_login.User', related_name='following', on_delete=models.CASCADE)
     followed = models.ForeignKey('user_login.User', related_name='followed', on_delete=models.CASCADE)
-    created_at = EncryptedDateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ('follower', 'followed')
@@ -68,8 +68,8 @@ class Post(models.Model):
     image = models.ImageField(upload_to='posts/images/', blank=True, null=True)
     video = models.FileField(upload_to='posts/videos/', blank=True, null=True)
     category = models.ForeignKey(Category, related_name='posts', on_delete=models.SET_NULL, null=True, blank=True)
-    created_at = EncryptedDateTimeField(auto_now_add=True)
-    updated_at = EncryptedDateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         ordering = ['-created_at'] #Newest posts first 

@@ -193,6 +193,9 @@ def user_logout_view(request):
     request.session.modified = True
     return redirect('user_login:user-login')
 
+
+
+
 # ------------------- USER DASHBOARD VIEW -------------------
 
 def user_dashboard_view(request):
@@ -241,6 +244,45 @@ def add_to_wishlist(request):
     
     return render(request, "user_login/add_to_wishlist.html", {"form": form})
 
+#---------------------UPDATE WISHLIST--------------------------
+# apps/user_login/views.py
+def update_wishlist(request, wishlist_id):
+    if "user_id" not in request.session:
+        return redirect("user_login:user-login")
+
+    user = User.objects.get(id=request.session["user_id"])
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_id, user=user)  # Ensure user owns the item
+
+    if request.method == "POST":
+        form = WishlistForm(request.POST, instance=wishlist_item)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Wishlist item updated successfully!")
+            return redirect("user_login:user_details")
+        else:
+            messages.error(request, "Error updating wishlist item.")
+    else:
+        form = WishlistForm(instance=wishlist_item)
+
+    return render(request, "user_login/update_wishlist.html", {"form": form, "wishlist_item": wishlist_item})
+
+#---------------------DELETE WISHLIST-----------------------------------------------------------------
+# apps/user_login/views.py
+def delete_wishlist(request, wishlist_id):
+    if "user_id" not in request.session:
+        return redirect("user_login:user-login")
+
+    user = User.objects.get(id=request.session["user_id"])
+    wishlist_item = get_object_or_404(Wishlist, id=wishlist_id, user=user)  # Ensure user owns the item
+
+    if request.method == "POST":
+        wishlist_item.delete()
+        messages.success(request, "Wishlist item deleted successfully!")
+        return redirect("user_login:user_details")
+
+    return render(request, "user_login/delete_wishlist.html", {"wishlist_item": wishlist_item})
+
+
 # ------------------- ADD A TRIP -------------------
 
 def add_trip(request):
@@ -262,6 +304,44 @@ def add_trip(request):
 
     form = TripForm()
     return render(request, "user_login/add_trip.html", {"form": form})
+
+#------------------------------UPDATE TRIP------------------------------
+# apps/user_login/views.py
+
+
+def update_trip(request, trip_id):
+    if "user_id" not in request.session:
+        return redirect("user_login:user-login")
+
+    user = User.objects.get(id=request.session["user_id"])
+    trip = get_object_or_404(Trip, id=trip_id, user=user)  # Ensure user owns the trip
+
+    if request.method == "POST":
+        form = TripForm(request.POST, instance=trip)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Trip updated successfully!")
+            return redirect("user_login:user_details")
+        else:
+            messages.error(request, "Error updating trip.")
+    else:
+        form = TripForm(instance=trip)
+
+    return render(request, "user_login/update_trip.html", {"form": form, "trip": trip})
+#------------------------------DELETE TRIP------------------------------
+def delete_trip(request, trip_id):
+    if "user_id" not in request.session:
+        return redirect("user_login:user-login")
+
+    user = User.objects.get(id=request.session["user_id"])
+    trip = get_object_or_404(Trip, id=trip_id, user=user)  # Ensure user owns the trip
+
+    if request.method == "POST":
+        trip.delete()
+        messages.success(request, "Trip deleted successfully!")
+        return redirect("user_login:user_details")
+
+    return render(request, "user_login/delete_trip.html", {"trip": trip})
 
 # ------------------- UPDATE PROFILE -------------------
 
@@ -317,7 +397,7 @@ def user_details_view(request):
                     messages.success(request, f"You are now following {user_to_follow.name}.")
         except User.DoesNotExist:
             messages.error(request, "User does not exist.")
-        return redirect('user_details')
+        return redirect('user_login:user_details')
     
     return render(request, "user_login/user_details.html", {
         "user": user,

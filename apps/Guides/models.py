@@ -9,17 +9,17 @@ from decimal import Decimal
 
 from django.conf import settings
 
-# Use your first Fernet key from settings
+
 fernet = Fernet(settings.FERNET_KEYS[0].encode())
 
 class EncryptedDecimalField(models.TextField):
-    
     def get_prep_value(self, value):
         if value is None:
             return value
         # Convert to string and encrypt
-        encrypted_value = fernet.encrypt(str(value).encode())
-        return encrypted_value.decode()  # Save as string in DB
+        str_value = str(value) if isinstance(value, (int, float, Decimal)) else value
+        encrypted_value = fernet.encrypt(str_value.encode())
+        return encrypted_value.decode()
 
     def from_db_value(self, value, expression, connection):
         return self.to_python(value)
@@ -27,14 +27,23 @@ class EncryptedDecimalField(models.TextField):
     def to_python(self, value):
         if value is None:
             return value
+        if isinstance(value, (int, float, Decimal)):
+            # Handle plain numeric values (e.g., default=1000.00)
+            return Decimal(str(value))
         try:
             # Decrypt and convert to Decimal
             decrypted_value = fernet.decrypt(value.encode()).decode()
             return Decimal(decrypted_value)
-        except (InvalidToken, ValueError) as e:
-            raise ValidationError(f"Invalid encrypted decimal value: {value}") from e
+        except (InvalidToken, ValueError):
+            # Log the error but don't raise ValidationError for plain text
+            return Decimal(value) if value.replace('.', '', 1).isdigit() else None
 
-
+    def get_default(self):
+        # Encrypt the default value
+        default = super().get_default()
+        if default is not None:
+            return self.get_prep_value(default)
+        return default
 
 # Abstract base model for common fields
 
@@ -129,12 +138,11 @@ class Guide(BasePerson):
         help_text="Enter the guide's key strengths, regions, or specialties."
     )
     amount = EncryptedDecimalField(
-        
-        default=1000.00,  
-        validators=[MinValueValidator(0.01)],
-        verbose_name="Payment Rate",
-        help_text="Set the standard rate per assignment."
-    )
+    default=Decimal('1000.00'),  # Use Decimal for clarity
+    validators=[MinValueValidator(Decimal('0.01'))],
+    verbose_name="Payment Rate",
+    help_text="Set the standard rate per assignment."
+)
    
     image = models.ImageField(
         null=True,

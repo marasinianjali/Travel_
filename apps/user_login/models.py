@@ -7,6 +7,19 @@ from apps.tour_package.models import TourPackage  # Importing TourPackage model
 from django.utils.text import slugify
 from fernet_fields import EncryptedCharField, EncryptedTextField
 
+from fernet_fields.fields import EncryptedField
+
+def patched_from_db_value(self, value, expression, connection):
+    if value is None:
+        return value
+    if isinstance(value, str):
+        value = value.encode('utf-8')  # Explicitly encode string to bytes
+    value = bytes(value)
+    return self.to_python(value)
+
+# Apply patch to EncryptedField (base class for EncryptedTextField and EncryptedCharField)
+EncryptedField.from_db_value = patched_from_db_value
+
 # Abstract Base Class for common fields
 class BaseModel(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)

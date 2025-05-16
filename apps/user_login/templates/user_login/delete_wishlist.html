@@ -1,0 +1,16 @@
+<!-- templates/user_login/delete_wishlist.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Delete Wishlist Item</title>
+</head>
+<body>
+    <h2>Delete Wishlist Item: {{ wishlist_item.destination_name }}</h2>
+    <p>Are you sure you want to delete this wishlist item?</p>
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">Confirm Delete</button>
+    </form>
+    <a href="{% url 'user_login:user_details' %}">Cancel</a>
+</body>
+</html>

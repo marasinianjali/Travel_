@@ -1,0 +1,21 @@
+<!-- templates/user_login/update_trip.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Update Trip</title>
+</head>
+<body>
+    <h2>Update Trip: {{ trip.destination }}</h2>
+    {% if messages %}
+        {% for message in messages %}
+            <p{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</p>
+        {% endfor %}
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Update Trip</button>
+    </form>
+    <a href="{% url 'user_login:user_details' %}">Back to Profile</a>
+</body>
+</html>

@@ -1,6 +1,8 @@
 from django.urls import path, include
 from . import views
 
+app_name = 'user_login'
+
 
 urlpatterns = [
     path('login/', views.login_view, name='login'),
@@ -26,6 +28,12 @@ urlpatterns = [
     path("add-to-wishlist/", views.add_to_wishlist, name="add_to_wishlist"),
     path("add-trip/", views.add_trip, name="add_trip"),
     path("update-profile/", views.update_profile, name="update_profile"),
+
+   
+    path('update-trip/<int:trip_id>/', views.update_trip, name='update_trip'),
+    path('delete-trip/<int:trip_id>/', views.delete_trip, name='delete_trip'),
+    path('update-wishlist/<int:wishlist_id>/', views.update_wishlist, name='update_wishlist'),
+    path('delete-wishlist/<int:wishlist_id>/', views.delete_wishlist, name='delete_wishlist'),
 
     # APIs URLS
     path('api/', include('apps.user_login.api_urls')),
