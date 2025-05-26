@@ -1,0 +1,5 @@
+POST http://localhost:8000/api/tourism-company/ HTTP/1.1
+content-type: application/json
+Accept: application/json
+Content-Type: application/json
+Authorization: Api-Key flqEdby6.6nXdzTpPyTS5ikunKCT0GUwkUV1fd62K

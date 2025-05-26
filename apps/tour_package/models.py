@@ -47,8 +47,9 @@ class TourPackage(models.Model):
         verbose_name="Tour Type",
         help_text="Type of tour (e.g., Adventure, Family, Cultural)."
     )
-    created_at = EncryptedDateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
+        null=True,
         verbose_name="Created At",
         help_text="Timestamp when the tour package was created."
     )
@@ -62,7 +63,9 @@ class TourPackage(models.Model):
         on_delete=models.CASCADE,
         related_name='tour_packages',
         verbose_name="Tourism Company",
-        help_text="Tourism company offering this package."
+        help_text="Tourism company offering this package.",
+        db_column='company_id'  # <-- This line tells Django to use the actual DB column
+        
     )
     
 
@@ -73,6 +76,7 @@ class TourPackage(models.Model):
         verbose_name = "Tour Package"
         verbose_name_plural = "Tour Packages"
         db_table = "tour_packages"
+        # db_table = " tour_package_tourpackage"
 
 
 # For tourism_company 

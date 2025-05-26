@@ -13,6 +13,7 @@ def is_admin(user):
 
 # List all guides with search and role context
 def guide_list(request):
+
     query = request.GET.get('search', '')
     if query:
         guides = Guide.objects.filter(name__icontains=query)
@@ -49,23 +50,22 @@ def guide_edit_delete(request, pk):
 @login_required
 @user_passes_test(is_admin)
 def guide_create(request):
+    print("Guide Create View Called")
     if request.method == 'POST':
         form = GuideForm(request.POST, request.FILES)
         if form.is_valid():
-            
-
             guide = form.save(commit=False)
-            
-            guide.is_approved = False  # Set to False by default
-
+            guide.is_approved = False
             guide.save()
             form.save_m2m()
             return redirect('guide_list')
         else:
+            print("Form errors:", form.errors)  # 👈 ADD THIS
             return render(request, 'guides/guide_form.html', {'form': form})
     else:
         form = GuideForm()
     return render(request, 'guides/guide_form.html', {'form': form})
+
 
 
 # Update an existing guide — login required

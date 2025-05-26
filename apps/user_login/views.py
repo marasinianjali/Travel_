@@ -53,6 +53,10 @@ def login_view(request):
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
+
+        # Flush previous session to avoid leftover data
+            request.session.flush()
+
             user = authenticate(request, username=username, password=password)
             if user is not None:
                 login(request, user)
@@ -162,6 +166,7 @@ def user_login_view(request):
             try:
                 user = User.objects.get(email=email)
                 if check_password(password, user.password):  # Verify hashed password
+                    request.session.flush()  # Flush previous session to avoid leftover data
                     request.session['user_id'] = user.id
                     request.session['user_name'] = user.name
                     request.session['user_role'] = "User"

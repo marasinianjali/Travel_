@@ -9,6 +9,7 @@ class TourPackageSerializer(serializers.ModelSerializer):
             'description', 'amount', 'duration', 'country',
             'city', 'tour_type', 'created_at', 'is_approved'
         ]
+        read_only_fields = ['package_id', 'created_at', 'is_approved']
 
 class TourismCompanySerializer(serializers.ModelSerializer):
     class Meta:

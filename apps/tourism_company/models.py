@@ -1,5 +1,5 @@
 from django.db import models
-from fernet_fields import EncryptedCharField, EncryptedEmailField
+
 
 class TourismCompany(models.Model):
     company_id = models.AutoField(
@@ -10,6 +10,7 @@ class TourismCompany(models.Model):
     user_name = models.CharField(
         max_length=100,
         verbose_name="User Name",
+        
         help_text="Name of the user who owns the company."
     )
     user_phone = models.CharField(
@@ -17,9 +18,8 @@ class TourismCompany(models.Model):
         verbose_name="User Phone",
         help_text="Contact number of the user."
     )
-    user_email = EncryptedEmailField(
-        max_length=55,
-       
+    user_email = models.EmailField(
+        max_length=254,
         verbose_name="User Email",
         help_text="Email of the user (must be unique)."
     )
@@ -34,7 +34,7 @@ class TourismCompany(models.Model):
         verbose_name="Company Phone",
         help_text="Contact number of the company."
     )
-    company_address = EncryptedCharField(
+    company_address = models.TextField(
         max_length=255,
         verbose_name="Company Address",
         help_text="Address of the company."

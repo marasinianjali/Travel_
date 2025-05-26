@@ -169,8 +169,9 @@ class Guide(BasePerson):
 
     
     class Meta:
-       
         verbose_name = "Tour Guide"
         verbose_name_plural = "Tour Guides"
+       
+        db_table = "guides_guide"
 
 

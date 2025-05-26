@@ -64,7 +64,7 @@ class Category(models.Model):
 class Post(models.Model):
     # group = models.ForeignKey('social_community.DiscussionGroup', on_delete=models.CASCADE, null=True, blank=True)
     user = models.ForeignKey(User, related_name='posts', on_delete=models.CASCADE)
-    content = EncryptedTextField()
+    content = models.TextField()
     image = models.ImageField(upload_to='posts/images/', blank=True, null=True)
     video = models.FileField(upload_to='posts/videos/', blank=True, null=True)
     category = models.ForeignKey(Category, related_name='posts', on_delete=models.SET_NULL, null=True, blank=True)

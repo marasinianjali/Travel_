@@ -2,7 +2,10 @@ from rest_framework import permissions
 
 class IsAdmin(permissions.BasePermission):
     def has_permission(self, request, view):
-        return request.user and request.user.groups.filter(name='Admin').exists()
+        return (
+            request.user
+            and (request.user.is_superuser or request.user.groups.filter(name='Admin').exists())
+        )
 
 class IsManager(permissions.BasePermission):
     def has_permission(self, request, view):
@@ -14,8 +17,10 @@ class IsCustomer(permissions.BasePermission):
 
 class IsAdminOrManager(permissions.BasePermission):
     def has_permission(self, request, view):
-        return (
-            request.user and 
-            (request.user.groups.filter(name='Admin').exists() or
-             request.user.groups.filter(name='Manager').exists())
+         return (
+            request.user and (
+                request.user.is_superuser or
+                request.user.groups.filter(name='Admin').exists() or
+                request.user.groups.filter(name='TourismCompany').exists()
+            )
         )

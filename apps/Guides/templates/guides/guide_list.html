@@ -90,7 +90,13 @@
 <body>
     <div class="container">
         <h1>Guides List</h1>
-        
+        print(request.session.keys()) 
+        <p>User ID: {{ user_id }}</p>
+        <p>User Role: {{ user_role }}</p>
+        <p>User ID: {{ request.session.user_id }}</p>
+        <p>User Role: {{ request.session.user_role }}</p>
+        <p>User Role Type: {{ user_role|default:"None" }}</p>
+
         <!-- Display guides if available, else show a no guides message -->
         {% if guides %}
         <table>
@@ -119,14 +125,17 @@
     {% else %}
         <p>No guides found.</p>
     {% endif %}
-                    {% if user_role == "Guest" %}
-                       
-                    <a href="{% url 'user_login:user_dashboard' %}">Back</a>
+                    {% if user_role == "Admin" %}
+                       <a href="{% url 'Guides:guide_create' %}">Add New Guide</a>
+                        <a href="{% url 'user_login:admin-dashboard' %}">Back</a>
+                    {% elif user_role == "User" %}
+                        
+                        <a href="{% url 'user_login:user_dashboard' %}">Back</a>
+                    
                     {% else %}
                      <div class="add-new-guide">
-                            <a href="{% url 'Guides:guide_create' %}">Add New Guide</a>
-                            <a href="{% url 'user_login:admin-dashboard' %}">Back</a>
-                         
+                            
+                         <a href="{% url 'user_login:user_dashboard' %}">Backkkkk</a>
                         </div>
                     {% endif %}
 

@@ -14,3 +14,4 @@ urlpatterns = [
     path('admin/guides/<int:pk>/', GuideAdminUpdateDestroyAPIView.as_view(), name='guide-admin-detail'),
     path('customer/guides/', GuideCustomerListAPIView.as_view(), name='guide-customer-list'),
 ]
+

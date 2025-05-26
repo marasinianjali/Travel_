@@ -38,12 +38,12 @@ class Article(models.Model):
         verbose_name="Category",
         help_text="Category of the article."
     )
-    created_at = EncryptedDateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the article was created."
     )
-    updated_at = EncryptedDateTimeField(
+    updated_at = models.DateTimeField(
         auto_now=True,
         verbose_name="Updated At",
         help_text="Timestamp when the article was last updated."
@@ -60,12 +60,12 @@ class Article(models.Model):
 
 
 class TravelNews(models.Model):
-    title = EncryptedCharField(
+    title = models.CharField(
         max_length=200,
         verbose_name="Title",
         help_text="Title of the travel news."
     )
-    content = EncryptedTextField(
+    content = models.TextField(
         verbose_name="Content",
         help_text="Content of the travel news."
     )
@@ -75,7 +75,7 @@ class TravelNews(models.Model):
         verbose_name="Source URL",
         help_text="Optional source link of the news."
     )
-    created_at = EncryptedDateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the news was published."
@@ -124,11 +124,11 @@ class Comment(models.Model):
         verbose_name="Comment Image",
         help_text="Optional image for the comment."
     )
-    content = EncryptedTextField(
+    content = models.TextField(
         verbose_name="Content",
         help_text="Content of the comment."
     )
-    created_at = EncryptedDateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the comment was made."
@@ -170,7 +170,7 @@ class Like(models.Model):
         verbose_name="Article",
         help_text="Article that was liked."
     )
-    created_at = EncryptedDateTimeField(
+    created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name="Created At",
         help_text="Timestamp when the like was made."

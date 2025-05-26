@@ -65,8 +65,10 @@ INSTALLED_APPS = [
     'axes',
     #for rest framework 
     'rest_framework',
+    'rest_framework_api_key',
     'rest_framework.authtoken',
     'rest_framework_simplejwt',
+    
     
 ]   
 
@@ -85,6 +87,9 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # ✅ Add this line
     )
     
 }
